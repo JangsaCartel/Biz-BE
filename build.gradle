@@ -1,0 +1,132 @@
+/* Biz-BE (WAR, Spring MVC/MyBatis) */
+plugins {
+    id 'java'
+    id 'war'
+    id 'eclipse-wtp'
+}
+
+group = 'com.jangsacartel'
+version = '1.0.0-SNAPSHOT'
+
+repositories { mavenCentral() }
+
+/* versions */
+ext {
+    junitVersion          = '5.9.2'
+    springVersion         = '5.3.37'
+    springSecurityVersion = '5.8.13'
+    lombokVersion         = '1.18.30'
+    jacksonVersion        = '2.17.2'
+    slf4jVersion          = '2.0.12'
+    log4j2Version         = '2.23.1'
+}
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+/* exclude conflicting loggers */
+configurations.all {
+    exclude group: 'log4j',           module: 'log4j'          // log4j 1.x
+    exclude group: 'org.slf4j',       module: 'slf4j-log4j12'  // SLF4J→log4j1
+    exclude group: 'commons-logging', module: 'commons-logging'
+    exclude group: 'ch.qos.logback',  module: 'logback-classic'
+    exclude group: 'ch.qos.logback',  module: 'logback-core'
+}
+
+dependencies {
+    /* Spring */
+    implementation "org.springframework:spring-context:${springVersion}"
+    implementation "org.springframework:spring-webmvc:${springVersion}"
+    implementation "org.springframework:spring-tx:${springVersion}"
+    implementation "org.springframework:spring-jdbc:${springVersion}"
+    implementation 'javax.inject:javax.inject:1'
+
+    /* Servlet (provided by external Tomcat) */
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
+
+    /* AOP */
+    implementation 'org.aspectj:aspectjrt:1.9.20'
+    implementation 'org.aspectj:aspectjweaver:1.9.20'
+
+    /* Logging: SLF4J → Log4j2 */
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "org.apache.logging.log4j:log4j-api:${log4j2Version}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4j2Version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j2-impl:${log4j2Version}"
+    implementation "org.apache.logging.log4j:log4j-jcl:${log4j2Version}"
+    implementation "org.apache.logging.log4j:log4j-web:${log4j2Version}"
+
+    /* SQL logging (log4jdbc) — 올바른 groupId */
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4:1.16'
+
+    /* XML */
+    implementation 'xerces:xercesImpl:2.12.2'
+
+    /* Lombok */
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    /* Jackson */
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+
+    /* DB / Pool */
+    implementation 'com.mysql:mysql-connector-j:8.1.0'
+    implementation 'com.zaxxer:HikariCP:5.1.0'
+
+    /* Redis */
+    implementation 'org.springframework.data:spring-data-redis:2.7.18'
+    implementation 'io.lettuce:lettuce-core:6.1.10.RELEASE'
+
+    /* MyBatis */
+    implementation 'org.mybatis:mybatis:3.5.0'
+    implementation 'org.mybatis:mybatis-spring:1.3.2'
+
+    /* Security + OAuth2 + JWT */
+    implementation "org.springframework.security:spring-security-web:${springSecurityVersion}"
+    implementation "org.springframework.security:spring-security-config:${springSecurityVersion}"
+    implementation "org.springframework.security:spring-security-oauth2-client:${springSecurityVersion}"
+    implementation "org.springframework.security:spring-security-oauth2-jose:${springSecurityVersion}"
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly   'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly   'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    /* Swagger 2 */
+    implementation 'io.springfox:springfox-swagger2:2.9.2'
+    implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+
+    /* Misc */
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.788'
+    implementation 'commons-fileupload:commons-fileupload:1.5'
+    implementation 'commons-io:commons-io:2.15.1'
+
+    /* Test */
+    testImplementation "org.springframework:spring-test:${springVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly    "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+    testRuntimeOnly    "org.junit.platform:junit-platform-launcher:1.9.2"
+    testCompileOnly    "org.projectlombok:lombok:${lombokVersion}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+}
+
+tasks.test {
+  useJUnitPlatform {
+    excludeTags 'db'
+  }
+}
+
+tasks.war {
+    archiveBaseName = 'biz-be'
+    archiveVersion  = version
+}
+
+/* ensure WTP publishes runtimeClasspath to WEB-INF/lib */
+eclipse {
+    wtp {
+        component {
+            plusConfigurations += [configurations.runtimeClasspath]
+        }
+    }
+}

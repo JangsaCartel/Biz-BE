@@ -1,0 +1,120 @@
+##############################
+# ? 기본 설정
+##############################
+
+# OS별 불필요 파일
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+##############################
+# ? Eclipse 관련
+##############################
+
+# Eclipse 프로젝트 메타파일
+.project
+.classpath
+.settings/
+*.launch
+*.buildship/
+
+# Eclipse Buildship 플러그인 캐시
+.buildship/
+
+##############################
+# ?? Gradle 관련
+##############################
+
+# Gradle 캐시 및 빌드 결과물
+.gradle/
+build/
+bin/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# Gradle GUI 설정
+gradle-app.setting
+.gradletasknamecache
+
+##############################
+# ? Java 관련
+##############################
+
+# 컴파일된 클래스
+*.class
+
+# 로그 파일
+*.log
+logs/
+
+# Java 힙 덤프 파일
+*.hprof
+
+# 임시 파일
+*.tmp
+*.bak
+
+##############################
+# ? 패키징 결과물
+##############################
+
+#  WAR, EAR 등 배포 아카이브
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+
+##############################
+# ? IDE 공통 (VSCode 등)
+##############################
+
+# VSCode 폴더
+.vscode/
+
+# IntelliJ 폴더 (혹시 혼용 시 대비)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+##############################
+# ? 민감한 설정 (로컬 전용)
+##############################
+
+# Spring Boot 설정 (환경에 따라 무시할지 선택)
+application.properties
+application.yml
+application-local.properties
+application-local.yml
+
+src\main\resources\application.properties
+
+
+##############################
+# ? 기타
+##############################
+
+# 로그, 임시, 캐시 디렉터리
+tmp/
+cache/
+
+##############################
+# WEB-INF 폴더 관리 (권장)
+##############################
+
+# WEB-INF 폴더 안의 모든 내용물(*)을 기본적으로 무시합니다.
+WEB-INF/*
+
+# 예외 처리: 반드시 Git에 포함해야 하는 소스 코드 및 설정 파일
+!WEB-INF/web.xml
+!WEB-INF/views/   # JSP 파일 등 뷰 소스 코드를 담는 폴더는 포함해야 합니다.
+
+# 빌드 결과물: 명시적으로 무시합니다.
+WEB-INF/lib/      # 의존성 라이브러리
+WEB-INF/classes/  # 컴파일된 .class 파일
