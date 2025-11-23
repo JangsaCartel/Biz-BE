@@ -126,13 +126,13 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public List<BoardDTO> findRecentPosts(String category, int limit) {
-		return boardMapper.findRecentPosts(category, limit);
+	public List<BoardDTO> findRecentPosts(int categoryId, int limit) {
+		return boardMapper.findRecentPosts(categoryId, limit);
 	}
 
 	@Override
-	public List<BoardDTO> findPostsByCategory(String category, int page, int pageSize) {
+	public List<BoardDTO> findPostsByCategory(int categoryId, int page, int pageSize) {
 		int offset = (page - 1) * pageSize;
-		return boardMapper.findPostsByCategory(category, offset, pageSize);
+		return boardMapper.findPostsByCategory(categoryId, offset, pageSize);
 	}
 }

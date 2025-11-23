@@ -27,25 +27,33 @@ public class BoardController {
 	public ResponseEntity<Map<String, Object>> getMainPage() {
 		Map<String, Object> response = new HashMap<>();
 
-		// Hot 게시판 (최근 3일간 좋아요가 가장 많은 글 3개)
+		// Hot 게시판 (카테고리 ID 1, 최근 3일간 좋아요 가장 많은 글 3개)
 		List<BoardDTO> hotPosts = boardService.findHotPosts(3);
 		response.put("hot", hotPosts);
 
 		// 나머지 게시판 (최신 글 3개씩)
-		List<CategoryDTO> categories = boardService.findAllCategories();
-		for (CategoryDTO category : categories) {
-			if (!"hot".equalsIgnoreCase(category.getName())) { // 'hot' 카테고리는 제외
-				List<BoardDTO> recentPosts = boardService.findRecentPosts(category.getName(), 3);
-				response.put(category.getName().toLowerCase(), recentPosts);
-			}
-		}
+		response.put("free", boardService.findRecentPosts(2, 3));
+		response.put("info", boardService.findRecentPosts(3, 3));
+		response.put("local", boardService.findRecentPosts(4, 3));
 
 		return ResponseEntity.ok(response);
 	}
 	
-	@GetMapping("freeboard")
+	@GetMapping("free")
 	public ResponseEntity<List<BoardDTO>> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory("자유게시판", page, 5);
+		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 5);
 		return ResponseEntity.ok(freeBoardPosts);
+	}
+
+	@GetMapping("info")
+	public ResponseEntity<List<BoardDTO>> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
+		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 5);
+		return ResponseEntity.ok(infoBoardPosts);
+	}
+
+	@GetMapping("local")
+	public ResponseEntity<List<BoardDTO>> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
+		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 5);
+		return ResponseEntity.ok(localBoardPosts);
 	}
 }
