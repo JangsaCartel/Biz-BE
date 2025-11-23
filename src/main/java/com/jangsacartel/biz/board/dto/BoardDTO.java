@@ -24,5 +24,9 @@ public class BoardDTO {
 	private Date modified_at;
 	private int user_id;
 	
+	// mapper로 계산
+	private int like_count;
+	private int comment_count;
+	
 
 }

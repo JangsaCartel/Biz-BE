@@ -1,6 +1,7 @@
 package com.jangsacartel.biz.board.dto;
 
 import lombok.AllArgsConstructor;
+
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,5 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class LikePostDTO {
+	
+	private int post_id;
+	private int user_id;
+	
+
 
 }
