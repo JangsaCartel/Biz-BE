@@ -49,4 +49,6 @@ public interface BoardMapper {
     List<BoardDTO> findRecentPosts(@Param("categoryId") int categoryId, @Param("limit") int limit);
     
     List<BoardDTO> findPostsByCategory(@Param("categoryId") int categoryId, @Param("offset") int offset, @Param("limit") int limit);
+    
+    int countPostsByCategory(@Param("categoryId") int categoryId);
 }

@@ -135,4 +135,9 @@ public class BoardServiceImpl implements BoardService {
 		int offset = (page - 1) * pageSize;
 		return boardMapper.findPostsByCategory(categoryId, offset, pageSize);
 	}
+
+	@Override
+	public int countPostsByCategory(int categoryId) {
+		return boardMapper.countPostsByCategory(categoryId);
+	}
 }

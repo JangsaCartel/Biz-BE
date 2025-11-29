@@ -46,4 +46,6 @@ public interface BoardService {
     List<BoardDTO> findRecentPosts(int categoryId, int limit);
     
     List<BoardDTO> findPostsByCategory(int categoryId, int page, int pageSize);
+    
+    int countPostsByCategory(int categoryId);
 }

@@ -40,20 +40,38 @@ public class BoardController {
 	}
 	
 	@GetMapping("free")
-	public ResponseEntity<List<BoardDTO>> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
+	public ResponseEntity<Map<String, Object>> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 5);
-		return ResponseEntity.ok(freeBoardPosts);
+		int totalCount = boardService.countPostsByCategory(2);
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("posts", freeBoardPosts);
+		response.put("totalCount", totalCount);
+		
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("info")
-	public ResponseEntity<List<BoardDTO>> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
+	public ResponseEntity<Map<String, Object>> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 5);
-		return ResponseEntity.ok(infoBoardPosts);
+		int totalCount = boardService.countPostsByCategory(3);
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("posts", infoBoardPosts);
+		response.put("totalCount", totalCount);
+		
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("local")
-	public ResponseEntity<List<BoardDTO>> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
+	public ResponseEntity<Map<String, Object>> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 5);
-		return ResponseEntity.ok(localBoardPosts);
+		int totalCount = boardService.countPostsByCategory(4);
+		
+		Map<String, Object> response = new HashMap<>();
+		response.put("posts", localBoardPosts);
+		response.put("totalCount", totalCount);
+
+		return ResponseEntity.ok(response);
 	}
 }
