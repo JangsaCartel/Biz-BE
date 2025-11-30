@@ -51,4 +51,8 @@ public interface BoardMapper {
     List<BoardDTO> findPostsByCategory(@Param("categoryId") int categoryId, @Param("offset") int offset, @Param("limit") int limit);
     
     int countPostsByCategory(@Param("categoryId") int categoryId);
+    
+    List<BoardDTO> selectHotBoardPosts(@Param("offset") int offset, @Param("limit") int limit);
+    
+    int countHotBoardPosts();
 }

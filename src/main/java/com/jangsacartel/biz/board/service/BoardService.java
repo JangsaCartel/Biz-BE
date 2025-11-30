@@ -48,4 +48,8 @@ public interface BoardService {
     List<BoardDTO> findPostsByCategory(int categoryId, int page, int pageSize);
     
     int countPostsByCategory(int categoryId);
+    
+    List<BoardDTO> findHotBoardPosts(int page, int pageSize);
+    
+    int getHotBoardPostsCount();
 }

@@ -148,5 +148,31 @@
             category_id = #{categoryId}
           AND deleted_at IS NULL
     </select>
+    
+    <select id="selectHotBoardPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT
+            p.post_id,
+            p.title,
+            SUBSTRING(p.content, 1, 20) as content,
+            p.created_at,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count
+        FROM
+            Post p
+        WHERE
+            p.deleted_at IS NULL
+        ORDER BY
+            like_count DESC, p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countHotBoardPosts" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            Post
+        WHERE
+            deleted_at IS NULL
+    </select>
 
 </mapper>

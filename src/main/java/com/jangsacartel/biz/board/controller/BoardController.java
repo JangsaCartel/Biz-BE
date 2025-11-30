@@ -39,6 +39,18 @@ public class BoardController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@GetMapping("/hot")
+	public ResponseEntity<Map<String, Object>> getHotBoardPage(@RequestParam(defaultValue = "1") int page) {
+		List<BoardDTO> hotBoardPosts = boardService.findHotBoardPosts(page, 5);
+		int totalCount = boardService.getHotBoardPostsCount();
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("posts", hotBoardPosts);
+		response.put("totalCount", totalCount);
+		
+		return ResponseEntity.ok(response);
+	}
+	
 	@GetMapping("free")
 	public ResponseEntity<Map<String, Object>> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 5);

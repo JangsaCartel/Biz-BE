@@ -140,4 +140,15 @@ public class BoardServiceImpl implements BoardService {
 	public int countPostsByCategory(int categoryId) {
 		return boardMapper.countPostsByCategory(categoryId);
 	}
+
+	@Override
+	public List<BoardDTO> findHotBoardPosts(int page, int pageSize) {
+		int offset = (page - 1) * pageSize;
+		return boardMapper.selectHotBoardPosts(offset, pageSize);
+	}
+
+	@Override
+	public int getHotBoardPostsCount() {
+		return boardMapper.countHotBoardPosts();
+	}
 }
