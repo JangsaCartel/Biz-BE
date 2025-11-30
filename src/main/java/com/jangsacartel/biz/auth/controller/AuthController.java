@@ -15,7 +15,7 @@ public class AuthController {
 
 	private final AuthService authService;
 
-	// 1. 로그인 (카카오, Biz 등)
+	// 1. 로그인 (카카오, 네이버, 구글)
 	// 요청 예시: GET /api/auth/login/kakao?code=인가코드
 	@GetMapping("/login/{provider}")
 	public ResponseEntity<?> login(@PathVariable String provider, @RequestParam String code) {

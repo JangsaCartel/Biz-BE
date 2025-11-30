@@ -2,10 +2,12 @@ package com.jangsacartel.biz.global.jwt.util;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
@@ -28,7 +30,7 @@ public class JwtUtil {
 	// [중요] @PostConstruct: 객체 생성 후 secret 값을 이용해 Key 객체를 미리 만들어둠
 	@PostConstruct
 	public void init() {
-		// 비밀키가 너무 짧으면 에러가 날 수 있습니다. (32글자 이상 권장)
+		// 비밀키가 너무 짧으면 에러가 날 수 있다. (32글자 이상 권장)
 		// 문자열을 바이트로 변환하여 HMAC-SHA 키 생성
 		this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 	}
@@ -40,7 +42,7 @@ public class JwtUtil {
 			.claim("role", role)
 			.setIssuedAt(new Date())
 			.setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRE))
-			.signWith(key, SignatureAlgorithm.HS256) // [수정됨] key 객체 사용
+			.signWith(key, SignatureAlgorithm.HS256)
 			.compact();
 	}
 
@@ -49,7 +51,7 @@ public class JwtUtil {
 		return Jwts.builder()
 			.setSubject(provider + ":" + providerId)
 			.setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXPIRE))
-			.signWith(key, SignatureAlgorithm.HS256) // [수정됨] key 객체 사용
+			.signWith(key, SignatureAlgorithm.HS256)
 			.compact();
 	}
 
@@ -60,13 +62,12 @@ public class JwtUtil {
 			.claim("provider", provider)
 			.claim("providerId", providerId)
 			.setExpiration(new Date(System.currentTimeMillis() + REGISTER_EXPIRE))
-			.signWith(key, SignatureAlgorithm.HS256) // [수정됨] key 객체 사용
+			.signWith(key, SignatureAlgorithm.HS256)
 			.compact();
 	}
 
 	// 4. 가입용 토큰 해석
 	public Map<String, String> parseRegisterToken(String token) {
-		// [수정됨] setSigningKey에 key 객체 전달
 		Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 
 		if (!"REGISTER".equals(claims.getSubject())) {
@@ -74,8 +75,8 @@ public class JwtUtil {
 		}
 
 		Map<String, String> map = new HashMap<>();
-		map.put("provider", (String) claims.get("provider"));
-		map.put("providerId", (String) claims.get("providerId"));
+		map.put("provider", (String)claims.get("provider"));
+		map.put("providerId", (String)claims.get("providerId"));
 		return map;
 	}
 
@@ -84,7 +85,6 @@ public class JwtUtil {
 		if (token != null && token.startsWith("Bearer ")) {
 			token = token.substring(7);
 		}
-		// [수정됨] setSigningKey에 key 객체 전달
 		return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
 	}
 }

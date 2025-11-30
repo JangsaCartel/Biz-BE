@@ -118,3 +118,6 @@ WEB-INF/*
 # ���� �����: ��������� �����մϴ�.
 WEB-INF/lib/      # ������ ���̺귯��
 WEB-INF/classes/  # �����ϵ� .class ����
+
+# 모든 properties 파일 무시 (보안/설정 파일)
+*.properties

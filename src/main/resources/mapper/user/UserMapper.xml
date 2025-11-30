@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jangsacartel.biz.user.mapper.UserMapper">
+    <select id="getTime" resultType="string">
+        SELECT NOW()
+    </select>
+
+    <select id="findByProviderAndProviderId" resultType="com.jangsacartel.biz.user.entity.UserVO">
+        SELECT user_id AS userId,
+               nickname,
+               provider,
+               provider_id AS providerId
+        FROM User
+        WHERE provider = #{provider}
+          AND provider_id = #{providerId}
+    </select>
+
+    <insert id="insertUser" parameterType="com.jangsacartel.biz.user.entity.UserVO"
+            useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO User (
+            nickname, provider, provider_id
+        ) VALUES (
+                     #{nickname}, #{provider}, #{providerId}
+                 )
+    </insert>
+
+    <insert id="insertUserInfo" parameterType="com.jangsacartel.biz.user.entity.UserInfoVO">
+        INSERT INTO User_Info (
+            user_id, region, user_storeName, business_type, business_reg_no, business_start_date
+        ) VALUES (
+                     #{userId}, #{region}, #{userStoreName}, #{businessType}, #{businessRegNo}, #{businessStartDate}
+                 )
+    </insert>
+</mapper>

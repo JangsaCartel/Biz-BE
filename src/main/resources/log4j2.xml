@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="[%d{yyyy-MM-dd HH:mm:ss}] [%-5level] [%logger{36}] - %msg%n"/>
+    </Console>
+  </Appenders>
+
+  <Loggers>
+    <!-- MyBatis 로그: org.apache.ibatis 권장 -->
+    <Logger name="org.apache.ibatis" level="warn" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+
+    <!-- Spring -->
+    <Logger name="org.springframework" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+
+    <!-- 애플리케이션 패키지: 너의 실제 베이스 패키지로 변경 -->
+    <Logger name="com.jangsacartel" level="debug" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+
+    <!-- log4jdbc 카테고리(원하면 SQL 타이밍 보기 좋음) -->
+    <Logger name="jdbc.sqltiming" level="debug" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+    <!-- 너무 시끄러우면 sqlonly는 INFO로 -->
+    <Logger name="jdbc.sqlonly" level="info" additivity="false">
+      <AppenderRef ref="Console"/>
+    </Logger>
+
+    <Root level="info">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>
