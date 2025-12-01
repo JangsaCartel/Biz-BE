@@ -18,15 +18,22 @@ import com.jangsacartel.biz.board.dto.BoardDTO;
 import com.jangsacartel.biz.board.dto.CategoryDTO;
 import com.jangsacartel.biz.board.service.BoardService;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+
 
 @RestController
 @RequestMapping("/")
+@Api(tags = "게시판 컨트롤러")
 public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
 
 	@PostMapping("/posts")
+	@ApiOperation(value="게시글 등록", notes="새로운 게시글을 등록합니다.")
     public ResponseEntity<BoardDTO> createPost(@RequestBody BoardDTO board) {
         try {
             boardService.insertPost(board);
@@ -37,6 +44,7 @@ public class BoardController {
     }
 
 	@GetMapping
+	@ApiOperation(value="메인 페이지", notes="메인 페이지에 필요한 데이터를 조회합니다.")
 	public ResponseEntity<Map<String, Object>> getMainPage() {
 		Map<String, Object> response = new HashMap<>();
 
@@ -53,6 +61,10 @@ public class BoardController {
 	}
 	
 	@GetMapping("/hot")
+	@ApiOperation(value = "Hot 게시판", notes = "Hot 게시판의 게시글 목록을 조회합니다.")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
+	})
 	public ResponseEntity<Map<String, Object>> getHotBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> hotBoardPosts = boardService.findHotBoardPosts(page, 5);
 		int totalCount = boardService.getHotBoardPostsCount();
@@ -65,6 +77,10 @@ public class BoardController {
 	}
 	
 	@GetMapping("free")
+	@ApiOperation(value = "자유 게시판", notes = "자유 게시판의 게시글 목록을 조회합니다.")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
+	})
 	public ResponseEntity<Map<String, Object>> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 5);
 		int totalCount = boardService.countPostsByCategory(2);
@@ -77,6 +93,10 @@ public class BoardController {
 	}
 
 	@GetMapping("info")
+	@ApiOperation(value = "정보 게시판", notes = "정보 게시판의 게시글 목록을 조회합니다.")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
+	})
 	public ResponseEntity<Map<String, Object>> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 5);
 		int totalCount = boardService.countPostsByCategory(3);
@@ -89,6 +109,10 @@ public class BoardController {
 	}
 
 	@GetMapping("local")
+	@ApiOperation(value = "지역 게시판", notes = "지역 게시판의 게시글 목록을 조회합니다.")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
+	})
 	public ResponseEntity<Map<String, Object>> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 5);
 		int totalCount = boardService.countPostsByCategory(4);
