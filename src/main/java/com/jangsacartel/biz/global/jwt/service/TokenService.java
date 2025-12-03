@@ -1,7 +1,6 @@
 package com.jangsacartel.biz.global.jwt.service;
 
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,18 +12,18 @@ public class TokenService {
 
 	private final RedisTemplate<String, String> redisTemplate;
 
-	// 토큰 저장 (key: "RT:카카오ID", value: "토큰값", 유효시간: 7일)
+	// Refresh Token 유효 기간: 7일
+	private final long refreshExpiration = 1000L * 60 * 60 * 24 * 7;
+
 	public void saveRefreshToken(String providerId, String refreshToken) {
-		redisTemplate.opsForValue().set("RT:" + providerId, refreshToken, Duration.ofDays(7));
+		redisTemplate.opsForValue().set("refresh:" + providerId, refreshToken, Duration.ofMillis(refreshExpiration));
 	}
 
-	// 토큰 조회
 	public String getRefreshToken(String providerId) {
-		return redisTemplate.opsForValue().get("RT:" + providerId);
+		return redisTemplate.opsForValue().get("refresh:" + providerId);
 	}
 
-	// 토큰 삭제 (로그아웃 시)
 	public void deleteRefreshToken(String providerId) {
-		redisTemplate.delete("RT:" + providerId);
+		redisTemplate.delete("refresh:" + providerId);
 	}
 }
