@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 public class LikePostDTO {
 	
 	@ApiModelProperty(value = "게시글 ID", example = "1", required = true)
-	private int post_id;
+	private int postId;
 	@ApiModelProperty(value = "유저 ID", example = "1", required = true)
-	private int user_id;
+	private int userId;
 	
 
 

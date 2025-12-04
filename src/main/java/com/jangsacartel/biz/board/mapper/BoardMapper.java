@@ -38,6 +38,7 @@ public interface BoardMapper {
     void insertPostLike(LikePostDTO likePost);
     void deletePostLike(LikePostDTO likePost);
     int countPostLikes(int postId);
+    int findPostLikeByUser(@Param("postId") int postId, @Param("userId") int userId);
 
     // Comment Like
     void insertCommentLike(LikeCommentDTO likeComment);

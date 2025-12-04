@@ -87,6 +87,10 @@
         SELECT COUNT(*) FROM Like_Post WHERE post_id = #{postId}
     </select>
 
+    <select id="findPostLikeByUser" resultType="int">
+        SELECT COUNT(*) FROM Like_Post WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
+
 
     <!-- ==================== Comment Like ==================== -->
     <insert id="insertCommentLike" parameterType="com.jangsacartel.biz.board.dto.LikeCommentDTO">

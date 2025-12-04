@@ -104,6 +104,19 @@ public class BoardServiceImpl implements BoardService {
         return boardMapper.countPostLikes(postId);
     }
 
+    @Override
+    public void likePost(int postId, int userId) {
+        // 이미 좋아요를 눌렀는지 확인
+        if (boardMapper.findPostLikeByUser(postId, userId) > 0) {
+            throw new RuntimeException("이미 좋아요를 누른 게시글입니다.");
+        }
+        // 좋아요 추가
+        LikePostDTO likePostDTO = new LikePostDTO();
+        likePostDTO.setPostId(postId);
+        likePostDTO.setUserId(userId);
+        boardMapper.insertPostLike(likePostDTO);
+    }
+
     // 댓글 좋아요(Comment Like) 관련 서비스 구현
     @Override
     public void insertCommentLike(LikeCommentDTO likeComment) {

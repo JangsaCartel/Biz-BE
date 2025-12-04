@@ -34,6 +34,7 @@ public interface BoardService {
     // 게시글 좋아요(Post Like) 관련 서비스 메서드
     void insertPostLike(LikePostDTO likePost);
     void deletePostLike(LikePostDTO likePost);
+    void likePost(int postId, int userId);
     int countPostLikes(int postId);
 
     // 댓글 좋아요(Comment Like) 관련 서비스 메서드
