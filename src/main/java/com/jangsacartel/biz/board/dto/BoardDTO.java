@@ -34,6 +34,9 @@ public class BoardDTO {
 	private Date modifiedAt;
 	@ApiModelProperty(value = "유저 ID", example = "1", required = true)
 	private int userId;
+
+	@ApiModelProperty(value = "작성자 닉네임", example = "장사천재")
+	private String nickname;
 	
 	// mapper로 계산
 	@ApiModelProperty(value = "좋아요 수", example = "10")

@@ -11,7 +11,22 @@
     </insert>
 
     <select id="findPostById" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
-        SELECT * FROM Post WHERE post_id = #{postId} AND deleted_at IS NULL
+        SELECT
+            p.post_id,
+            p.title,
+            p.content,
+            p.created_at,
+            p.category_id,
+            p.deleted_at,
+            p.modified_at,
+            p.user_id,
+            u.nickname
+        FROM 
+            Post p
+        JOIN 
+            User u ON p.user_id = u.user_id
+        WHERE 
+            p.post_id = #{postId} AND p.deleted_at IS NULL
     </select>
 
     <select id="findAllPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
@@ -129,6 +144,7 @@
         SELECT
             p.post_id,
             p.title,
+            p.category_id,
             SUBSTRING(p.content, 1, 20) as content,
             p.created_at,
             (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
@@ -157,6 +173,7 @@
         SELECT
             p.post_id,
             p.title,
+            p.category_id,
             SUBSTRING(p.content, 1, 20) as content,
             p.created_at,
             (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
