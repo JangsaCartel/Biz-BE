@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiOperation;
 
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 @Api(tags = "게시판 컨트롤러")
 public class BoardController {
 
