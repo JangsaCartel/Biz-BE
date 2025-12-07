@@ -162,6 +162,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public int getHotBoardPostsCount() {
-		return boardMapper.countHotBoardPosts();
+		int totalCount = boardMapper.countHotBoardPosts();
+		return Math.min(totalCount, 100);
 	}
 }

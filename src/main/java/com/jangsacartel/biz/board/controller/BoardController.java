@@ -7,6 +7,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,8 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping("/api")
 @Api(tags = "게시판 컨트롤러")
 public class BoardController {
+
+	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 
 	@Autowired
 	private BoardService boardService;
@@ -97,6 +101,7 @@ public class BoardController {
             boardService.insertPost(board);
             return new ResponseEntity<>(board, HttpStatus.CREATED);
         } catch (Exception e) {
+			logger.error("Error creating post", e);
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -124,7 +129,7 @@ public class BoardController {
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
 	public ResponseEntity<Map<String, Object>> getHotBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> hotBoardPosts = boardService.findHotBoardPosts(page, 5);
+		List<BoardDTO> hotBoardPosts = boardService.findHotBoardPosts(page, 4);
 		int totalCount = boardService.getHotBoardPostsCount();
 
 		Map<String, Object> response = new HashMap<>();
@@ -140,7 +145,7 @@ public class BoardController {
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
 	public ResponseEntity<Map<String, Object>> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 5);
+		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 4);
 		int totalCount = boardService.countPostsByCategory(2);
 		
 		Map<String, Object> response = new HashMap<>();
@@ -156,7 +161,7 @@ public class BoardController {
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
 	public ResponseEntity<Map<String, Object>> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 5);
+		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 4);
 		int totalCount = boardService.countPostsByCategory(3);
 
 		Map<String, Object> response = new HashMap<>();
@@ -172,7 +177,7 @@ public class BoardController {
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
 	public ResponseEntity<Map<String, Object>> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 5);
+		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 4);
 		int totalCount = boardService.countPostsByCategory(4);
 		
 		Map<String, Object> response = new HashMap<>();
