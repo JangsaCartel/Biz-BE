@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jangsacartel.biz.board.mapper.BoardMapper">
+
+    <!-- ==================== Post ==================== -->
+    <insert id="insertPost" parameterType="com.jangsacartel.biz.board.dto.BoardDTO">
+        INSERT INTO Post (title, content, created_at, category_id, user_id)
+        VALUES (#{title}, #{content}, NOW(), #{categoryId}, #{userId})
+    </insert>
+
+    <select id="findPostById" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT
+            p.post_id,
+            p.title,
+            p.content,
+            p.created_at,
+            p.category_id,
+            p.deleted_at,
+            p.modified_at,
+            p.user_id,
+            u.nickname
+        FROM 
+            Post p
+        JOIN 
+            User u ON p.user_id = u.user_id
+        WHERE 
+            p.post_id = #{postId} AND p.deleted_at IS NULL
+    </select>
+
+    <select id="findAllPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT * FROM Post WHERE deleted_at IS NULL ORDER BY created_at DESC
+    </select>
+
+    <update id="updatePost" parameterType="com.jangsacartel.biz.board.dto.BoardDTO">
+        UPDATE Post
+        SET title = #{title},
+            content = #{content},
+            category_id = #{categoryId},
+            modified_at = NOW()
+        WHERE post_id = #{postId}
+    </update>
+
+    <update id="deletePost" parameterType="int">
+        UPDATE Post SET deleted_at = NOW() WHERE post_id = #{postId}
+    </update>
+
+
+    <!-- ==================== Category ==================== -->
+    <select id="findAllCategories" resultType="com.jangsacartel.biz.board.dto.CategoryDTO">
+        SELECT * FROM Category
+    </select>
+
+
+    <!-- ==================== Comment ==================== -->
+    <insert id="insertComment" parameterType="com.jangsacartel.biz.board.dto.CommentDTO">
+        INSERT INTO Comment (post_id, parent_comment_id, content, created_at)
+        VALUES (#{postId}, #{parentCommentId}, #{content}, NOW())
+    </insert>
+
+    <select id="findCommentsByPostId" resultType="com.jangsacartel.biz.board.dto.CommentDTO">
+        SELECT * FROM Comment WHERE post_id = #{postId} AND deleted_at IS NULL ORDER BY created_at ASC
+    </select>
+
+    <update id="updateComment" parameterType="com.jangsacartel.biz.board.dto.CommentDTO">
+        UPDATE Comment
+        SET content = #{content},
+            modified_at = NOW()
+        WHERE comment_id = #{commentId}
+    </update>
+
+    <update id="deleteComment" parameterType="int">
+        UPDATE Comment SET deleted_at = NOW() WHERE comment_id = #{commentId}
+    </update>
+
+
+    <!-- ==================== File ==================== -->
+    <insert id="insertFile" parameterType="com.jangsacartel.biz.board.dto.FileDTO">
+        INSERT INTO File (post_id, url) VALUES (#{postId}, #{url})
+    </insert>
+
+    <select id="findFilesByPostId" resultType="com.jangsacartel.biz.board.dto.FileDTO">
+        SELECT * FROM File WHERE post_id = #{postId}
+    </select>
+
+    <delete id="deleteFile" parameterType="int">
+        DELETE FROM File WHERE file_id = #{fileId}
+    </delete>
+
+
+    <!-- ==================== Post Like ==================== -->
+    <insert id="insertPostLike" parameterType="com.jangsacartel.biz.board.dto.LikePostDTO">
+        INSERT INTO Like_Post (post_id, user_id) VALUES (#{postId}, #{userId})
+    </insert>
+
+    <delete id="deletePostLike" parameterType="com.jangsacartel.biz.board.dto.LikePostDTO">
+        DELETE FROM Like_Post WHERE post_id = #{postId} AND user_id = #{userId}
+    </delete>
+
+    <select id="countPostLikes" resultType="int">
+        SELECT COUNT(*) FROM Like_Post WHERE post_id = #{postId}
+    </select>
+
+    <select id="findPostLikeByUser" resultType="int">
+        SELECT COUNT(*) FROM Like_Post WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
+
+
+    <!-- ==================== Comment Like ==================== -->
+    <insert id="insertCommentLike" parameterType="com.jangsacartel.biz.board.dto.LikeCommentDTO">
+        INSERT INTO Like_Comment (comment_id, post_id, user_id)
+        VALUES (#{commentId}, #{postId}, #{userId})
+    </insert>
+
+    <delete id="deleteCommentLike" parameterType="com.jangsacartel.biz.board.dto.LikeCommentDTO">
+        DELETE FROM Like_Comment
+        WHERE comment_id = #{commentId} AND post_id = #{postId} AND user_id = #{userId}
+    </delete>
+
+    <select id="countCommentLikes" resultType="int">
+        SELECT COUNT(*) FROM Like_Comment WHERE comment_id = #{commentId}
+    </select>
+    
+    <select id="findHotPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT p.*, COUNT(lp.post_id) AS like_count
+        FROM Post p
+        LEFT JOIN Like_Post lp ON p.post_id = lp.post_id
+        WHERE p.created_at >= DATE_SUB(NOW(), INTERVAL 3 DAY) AND p.deleted_at IS NULL
+        GROUP BY p.post_id
+        ORDER BY like_count DESC, p.created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findRecentPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT *
+        FROM Post
+        WHERE category_id = #{categoryId} AND deleted_at IS NULL
+        ORDER BY created_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="findPostsByCategory" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT
+            p.post_id,
+            p.title,
+            p.category_id,
+            SUBSTRING(p.content, 1, 20) as content,
+            p.created_at,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count
+        FROM
+            Post p
+        WHERE
+            p.category_id = #{categoryId}
+          AND p.deleted_at IS NULL
+        ORDER BY
+            p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countPostsByCategory" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            Post
+        WHERE
+            category_id = #{categoryId}
+          AND deleted_at IS NULL
+    </select>
+    
+    <select id="selectHotBoardPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT
+            p.post_id,
+            p.title,
+            p.category_id,
+            SUBSTRING(p.content, 1, 20) as content,
+            p.created_at,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count
+        FROM
+            Post p
+        WHERE
+            p.deleted_at IS NULL
+        ORDER BY
+            like_count DESC, p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countHotBoardPosts" resultType="int">
+        SELECT
+            COUNT(*)
+        FROM
+            Post
+        WHERE
+            deleted_at IS NULL
+    </select>
+
+</mapper>

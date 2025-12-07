@@ -104,10 +104,8 @@ public class KakaoAuthService {
 		return exists;
 	}
 
-	/**
-	 * ✅ 1. 내 정보 조회 (DB 숫자 -> 프론트 문자열 변환)
-	 * DB에서 꺼낸 숫자(예: 12345)를 "0000012345"로 바꿔서 줍니다.
-	 */
+	//1. 내 정보 조회 (DB 숫자 -> 프론트 문자열 변환)
+	//   DB에서 꺼낸 숫자(예: 12345)를 "0000012345"로 바꿔서 줍니다.
 	public UserResponseDTO getUserInfo(Long userId) {
 		// 1. DB에서 정보 조회 (이때 UserInfoVO 안에는 Long 타입 숫자가 들어있음)
 		UserInfoVO userInfo = userMapper.findUserInfoByUserId(userId);
@@ -131,10 +129,8 @@ public class KakaoAuthService {
 			.build();
 	}
 
-	/**
-	 * ✅ 2. 사업자 번호 중복 검사 (프론트 문자열 -> DB 숫자 비교)
-	 * 프론트가 "0000012345"를 보내도 숫자로 바꾸면 12345가 되므로 DB와 비교 가능합니다.
-	 */
+	// 2. 사업자 번호 중복 검사 (프론트 문자열 -> DB 숫자 비교)
+	//    프론트가 "0000012345"를 보내도 숫자로 바꾸면 12345가 되므로 DB와 비교 가능합니다.
 	public boolean checkDuplicateRegNo(String inputRegNo) {
 		try {
 			// 문자열을 숫자로 변환 (앞의 0은 자연스럽게 사라짐)
