@@ -45,11 +45,12 @@ public class JwtUtil {
 	}
 
 	// Access Token 발급
-	public String generateAccessToken(String provider, String providerId, String role) {
+	public String generateAccessToken(String provider, String providerId, Long userId, String role) {
 		return Jwts.builder()
 			.setSubject(provider + ":" + providerId)
 			.claim("provider", provider)
 			.claim("providerId", providerId)
+			.claim("userId", userId)
 			.claim("role", role)
 			.setIssuedAt(new Date())
 			.setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRE))
