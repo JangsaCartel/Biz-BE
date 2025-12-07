@@ -137,6 +137,6 @@ public class KakaoAuthService {
 		tokenService.saveRefreshToken(providerId, refreshToken);
 
 		log.info("🔑 [Service] JWT 토큰 발급 완료 (User ID: {})", user.getUserId());
-		return jwtUtil.generateAccessToken("kakao", providerId, "USER");
+		return jwtUtil.generateAccessToken("kakao", providerId, user.getUserId(), "USER");
 	}
 }
