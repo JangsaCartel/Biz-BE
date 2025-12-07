@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jangsacartel.biz.board.dto.BoardDTO;
 import com.jangsacartel.biz.board.service.BoardService;
+import com.jangsacartel.biz.global.jwt.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import io.swagger.annotations.Api;
@@ -33,6 +36,9 @@ public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
+
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	@GetMapping("/board/{postId}")
 	@ApiOperation(value="게시글 상세 조회", notes="게시글 ID로 특정 게시글의 상세 정보를 조회합니다.")
@@ -71,8 +77,23 @@ public class BoardController {
 	
 	@PostMapping("/posts")
 	@ApiOperation(value="게시글 등록", notes="새로운 게시글을 등록합니다.")
-    public ResponseEntity<BoardDTO> createPost(@RequestBody BoardDTO board) {
+    public ResponseEntity<BoardDTO> createPost(@RequestBody BoardDTO board, HttpServletRequest request) {
         try {
+			String token = request.getHeader("Authorization");
+			if (token == null) {
+				return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+			}
+
+			Claims claims = jwtUtil.validateToken(token);
+			Number userIdNumber = claims.get("userId", Number.class);
+
+			if (userIdNumber == null) {
+				return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+			}
+			
+			int userId = userIdNumber.intValue();
+			board.setUserId(userId);
+
             boardService.insertPost(board);
             return new ResponseEntity<>(board, HttpStatus.CREATED);
         } catch (Exception e) {
