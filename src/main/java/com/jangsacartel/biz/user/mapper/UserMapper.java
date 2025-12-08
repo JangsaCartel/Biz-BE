@@ -19,4 +19,13 @@ public interface UserMapper {
 
 	// 3. 사업자 정보 저장 (User_Info 테이블)
 	void insertUserInfo(UserInfoVO userInfo);
+
+	// 상세 정보 조회
+	UserInfoVO findUserInfoByUserId(Long userId);
+
+	// 기본 정보 조회 (닉네임 등)
+	UserVO findUserById(Long userId);
+
+	// 사업자 번호 중복 확인 (파라미터는 int)
+	boolean existsByBusinessRegNo(Integer businessRegNo);
 }
