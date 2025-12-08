@@ -34,4 +34,18 @@
                      #{userId}, #{region}, #{userStoreName}, #{businessType}, #{businessRegNo}, #{businessStartDate}
                  )
     </insert>
+
+    <select id="findUserInfoByUserId" resultType="com.jangsacartel.biz.user.entity.UserInfoVO">
+        SELECT * FROM User_Info WHERE user_id = #{userId}
+    </select>
+
+    <select id="findUserById" resultType="com.jangsacartel.biz.user.entity.UserVO">
+        SELECT * FROM User WHERE user_id = #{userId}
+    </select>
+
+    <select id="existsByBusinessRegNo" parameterType="int" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM User_Info
+        WHERE business_reg_no = #{businessRegNo}
+    </select>
 </mapper>

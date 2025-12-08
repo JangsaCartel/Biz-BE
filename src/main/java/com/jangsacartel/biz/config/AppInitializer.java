@@ -11,6 +11,8 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         // 전역(비웹) 설정들
         return new Class<?>[]{
             RootConfig.class,
+            SecurityConfig.class,
+            RedisConfig.class,
             JacksonConfig.class,
             CorsConfig.class,     // ← CorsFilter 방식 사용할 때만 포함
             SwaggerConfig.class   // Docket은 웹 빈이라 WebConfig/Root 어느쪽이든 가능
