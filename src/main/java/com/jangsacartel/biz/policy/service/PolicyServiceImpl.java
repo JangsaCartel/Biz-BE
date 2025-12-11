@@ -58,7 +58,7 @@ public class PolicyServiceImpl implements PolicyService {
                 + "&pageUnit=" + cond.getPageUnit()
                 + "&pageIndex=" + cond.getPageIndex();
 
-        if (searchLclasId != null) {
+        if (searchLclasId != null && !searchLclasId.isBlank()) {
             url += "&searchLclasId=" + searchLclasId;
         }
         if (hashtagsParam != null) {
@@ -120,7 +120,7 @@ public class PolicyServiceImpl implements PolicyService {
                 .items(items)
                 .build();
     }
-
+    
 
     // Bizinfo 한 건(BizinfoPolicyVO)을 프론트 카드 한 장(PolicyListItemDto)으로 변환.
     private PolicyListItemDto toListItemDto(BizinfoPolicyVO vo) {
@@ -137,7 +137,30 @@ public class PolicyServiceImpl implements PolicyService {
                 .dDay(calcDDay(vo.getReqstBeginEndDe()))
                 .tags(splitTags(vo.getHashtags()))
                 .createdAt(vo.getCreatPnttm())
+                
+                .target(vo.getTrgetNm())
+                .contact(vo.getRefrncNm())
+                .htmlContent(vo.getBsnsSumryCn())
+                .applyUrl(vo.getRceptEngnHmpgUrl())
+                .originalUrl("https://www.bizinfo.go.kr" + vo.getPblancUrl())
+                .mainFileName(vo.getPrintFileNm())
+                .printFlpthNm(vo.getPrintFlpthNm())
+                .extraFileNames(splitFileNames(vo.getFileNm()))
+                .extraFileUrls(splitFileNames(vo.getFlpthNm()))
+                
                 .build();
+    }
+
+    // Bizinfo에서 내려오는 파일명/파일경로 문자열을 리스트로 변환. "file1@file2@file3" 형태를 분리.
+    private List<String> splitFileNames(String fileNm) {
+        if (fileNm == null || fileNm.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(fileNm.split("@"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
     }
 
     // "20251126 ~ 20251231" 형태의 문자열을 "2025.11.26 ~ 2025.12.31" 와 같이 표시용 포맷으로 변환. 형식이 맞지 않으면 "상시접수" 로 처리한다.
