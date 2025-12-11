@@ -21,4 +21,16 @@ public class PolicyListItemDto {
     private String dDay;            // "D-3", "D-DAY", "마감" 등
     private List<String> tags;      // ["금융","서울",...]
     private String createdAt;       // creatPnttm
+    
+ // 상세페이지용 필드 추가
+    private String target;
+    private String contact;
+    private String htmlContent;
+    private String applyUrl;
+    private String originalUrl;
+    private String mainFileName;
+    private String printFlpthNm;
+    private List<String> extraFileNames;
+    private List<String> extraFileUrls;
+
 }
