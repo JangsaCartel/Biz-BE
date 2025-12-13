@@ -2,7 +2,7 @@ package com.jangsacartel.biz.auth.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jangsacartel.biz.auth.dto.AdditionalUserInfo;
+import com.jangsacartel.biz.auth.dto.AdditionalUserInfoDTO;
 import com.jangsacartel.biz.auth.dto.KakaoTokenResponse;
 import com.jangsacartel.biz.auth.dto.KakaoUserInfo;
 import com.jangsacartel.biz.global.jwt.service.TokenService;
@@ -149,7 +149,7 @@ public class KakaoAuthService {
 
 	// 4. 로그인 또는 회원가입 처리 (JWT 발급)
 	@Transactional
-	public String loginOrRegisterUser(KakaoUserInfo userInfo, AdditionalUserInfo additional) {
+	public String loginOrRegisterUser(KakaoUserInfo userInfo, AdditionalUserInfoDTO additional) {
 		String providerId = userInfo.getProviderId();
 		UserVO user = userMapper.findByProviderAndProviderId("kakao", providerId);
 
