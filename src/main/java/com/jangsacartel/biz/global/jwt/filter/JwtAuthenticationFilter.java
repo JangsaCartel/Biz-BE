@@ -32,8 +32,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		// 로그인 관련 API는 필터를 타지 않도록 설정 (이중 안전장치)
-		String path = request.getRequestURI();
-		return path.startsWith("/api/auth/") || path.startsWith("/api/kakao/");
+		String uri = request.getRequestURI();
+	    String ctx = request.getContextPath();  // 보통 "/biz-be"
+	    String path = (ctx != null && !ctx.isEmpty()) ? uri.substring(ctx.length()) : uri;
+		return path.startsWith("/api/auth/") 
+				|| path.startsWith("/api/kakao/")
+				|| path.startsWith("/v2/api-docs")
+		        || path.startsWith("/swagger")
+		        || path.startsWith("/swagger-resources")
+		        || path.startsWith("/webjars");
 	}
 
 	@Override
@@ -82,7 +89,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				return; // 필터 중단
 			} catch (Exception e) {
 				log.error("❌ [Filter] 토큰 검증 오류: {}", e.getMessage(), e);
-				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				response.setContentType("application/json;charset=UTF-8");
 				response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"유효하지 않은 토큰입니다.\"}");
 				return; // 필터 중단

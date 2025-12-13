@@ -30,12 +30,31 @@ public class SecurityConfig {
 			.formLogin().disable()
 			.httpBasic().disable()
 			.authorizeHttpRequests(auth -> auth
-				// 인증 없이 접근 가능한 경로들
-				.antMatchers("/api/auth/**", "/api/kakao/**").permitAll()
-				.antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-				// 그 외 모든 요청은 인증 필요
-				.anyRequest().authenticated()
-			)
+				    .requestMatchers("/api/auth/**", "/api/kakao/**").permitAll()
+				    .requestMatchers(
+				            "/swagger-ui.html",
+				            "/v2/api-docs",
+				            "/swagger-resources/**",
+				            "/swagger-resources",
+				            "/webjars/**"
+				        ).permitAll()
+				    // ✅ springfox(swagger2) 허용
+				    .requestMatchers(
+				    		"/biz-be/swagger-ui.html",
+				    	    "/biz-be/v2/api-docs",
+				    	    "/biz-be/swagger-resources/**",
+				    	    "/biz-be/swagger-resources",
+				    	    "/biz-be/webjars/**"
+				    ).permitAll()
+
+				 // ✅ swagger-ui가 로딩 중 찌르는 부가 요청들
+				    .requestMatchers("/", "/csrf").permitAll()
+
+				    // (선택) 컨텍스트 포함 케이스 대비
+				    .requestMatchers("/biz-be/", "/biz-be/csrf").permitAll()
+				    
+				    .anyRequest().authenticated()
+				)
 			// JWT 필터 추가
 			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
