@@ -15,7 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
 @AllArgsConstructor
 @Builder
 @ApiModel(description = "정책 카드/상세에 사용되는 정책 항목 DTO")
-public class PolicyListItemDto {
+public class PolicyListItemDTO {
 	// 정책 카드 한 개에 대응하는 DTO
 	
 	@ApiModelProperty(value = "정책 ID (pblancId)", example = "PBLN_000000000116756")

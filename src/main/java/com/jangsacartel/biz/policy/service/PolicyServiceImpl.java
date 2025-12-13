@@ -1,19 +1,16 @@
 package com.jangsacartel.biz.policy.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jangsacartel.biz.policy.dto.PolicyListItemDto;
-import com.jangsacartel.biz.policy.dto.PolicyPagedResponseDto;
-import com.jangsacartel.biz.policy.dto.PolicySearchRequestDto;
+import com.jangsacartel.biz.policy.dto.PolicyListItemDTO;
+import com.jangsacartel.biz.policy.dto.PolicyPagedResponseDTO;
+import com.jangsacartel.biz.policy.dto.PolicySearchRequestDTO;
 import com.jangsacartel.biz.policy.entity.BizinfoPolicyResponseVO;
 import com.jangsacartel.biz.policy.entity.BizinfoPolicyVO;
 import com.jangsacartel.biz.policy.enums.PolicyDomain;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -40,7 +37,7 @@ public class PolicyServiceImpl implements PolicyService {
 
     // 정책 목록 조회
     @Override
-    public PolicyPagedResponseDto searchPolicies(PolicySearchRequestDto cond) {
+    public PolicyPagedResponseDTO searchPolicies(PolicySearchRequestDTO cond) {
 
     	// 1. 분야 라벨("내수 분야" 등)을 Bizinfo에서 요구하는 코드값(searchLclasId)로 변환
         PolicyDomain domain = PolicyDomain.fromLabel(cond.getDomainLabel());
@@ -78,7 +75,7 @@ public class PolicyServiceImpl implements PolicyService {
         } catch (Exception e) {
         	// 파싱에 실패하면 빈 페이지를 반환
             log.error("JSON 파싱 오류", e);
-            return PolicyPagedResponseDto.builder()
+            return PolicyPagedResponseDTO.builder()
                     .page(cond.getPageIndex())
                     .size(cond.getPageUnit())
                     .totalItems(0)
@@ -89,7 +86,7 @@ public class PolicyServiceImpl implements PolicyService {
 
      // 응답 본문이 없을 시 빈 페이지 반환
         if (response == null || response.getJsonArray() == null) {
-            return PolicyPagedResponseDto.builder()
+            return PolicyPagedResponseDTO.builder()
                     .page(cond.getPageIndex())
                     .size(cond.getPageUnit())
                     .totalItems(0)
@@ -99,7 +96,7 @@ public class PolicyServiceImpl implements PolicyService {
         }
 
         // 6. Bizinfo 원본 VO 리스트 → FE 전용 DTO 리스트로 변환
-        List<PolicyListItemDto> items = response.getJsonArray().stream()
+        List<PolicyListItemDTO> items = response.getJsonArray().stream()
                 .map(this::toListItemDto)
                 .collect(Collectors.toList());
 
@@ -112,7 +109,7 @@ public class PolicyServiceImpl implements PolicyService {
         int totalPages = (int) Math.ceil((double) totalCnt / cond.getPageUnit());
 
         // 7. 프론트에서 바로 사용하는 페이징 응답 DTO 생성
-        return PolicyPagedResponseDto.builder()
+        return PolicyPagedResponseDTO.builder()
                 .page(cond.getPageIndex())
                 .size(cond.getPageUnit())
                 .totalItems(totalCnt)
@@ -122,14 +119,14 @@ public class PolicyServiceImpl implements PolicyService {
     }
     
 
-    // Bizinfo 한 건(BizinfoPolicyVO)을 프론트 카드 한 장(PolicyListItemDto)으로 변환.
-    private PolicyListItemDto toListItemDto(BizinfoPolicyVO vo) {
+    // Bizinfo 한 건(BizinfoPolicyVO)을 프론트 카드 한 장(PolicyListItemDTO)으로 변환.
+    private PolicyListItemDTO toListItemDto(BizinfoPolicyVO vo) {
 
         String organization = (vo.getExcInsttNm() != null && !vo.getExcInsttNm().isEmpty())
                 ? vo.getJrsdInsttNm() + " · " + vo.getExcInsttNm()
                 : vo.getJrsdInsttNm();
 
-        return PolicyListItemDto.builder()
+        return PolicyListItemDTO.builder()
                 .id(vo.getPblancId())
                 .organization(organization)
                 .title(vo.getPblancNm())

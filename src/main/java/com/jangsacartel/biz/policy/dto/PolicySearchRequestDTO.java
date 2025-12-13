@@ -15,7 +15,7 @@ import io.swagger.annotations.ApiModelProperty;
 @AllArgsConstructor
 @Builder
 @ApiModel(description = "정책 검색 조건 DTO (서비스 내부용)")
-public class PolicySearchRequestDto {
+public class PolicySearchRequestDTO {
 
 	@ApiModelProperty(value = "도메인 라벨", example = "창업")
     private String domainLabel;

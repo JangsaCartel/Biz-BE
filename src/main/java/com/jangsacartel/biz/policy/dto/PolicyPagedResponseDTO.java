@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 @ApiModel(description = "정책 목록 페이징 응답 DTO")
-public class PolicyPagedResponseDto {
+public class PolicyPagedResponseDTO {
 
     @ApiModelProperty(value = "현재 페이지 번호 (1부터 시작)", example = "1")
     private int page;
@@ -25,5 +25,5 @@ public class PolicyPagedResponseDto {
     private int totalPages;
     
     @ApiModelProperty(value = "정책 목록")
-    private List<PolicyListItemDto> items;
+    private List<PolicyListItemDTO> items;
 }

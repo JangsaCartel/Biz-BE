@@ -1,8 +1,7 @@
 package com.jangsacartel.biz.policy.controller;
 
-import com.jangsacartel.biz.policy.dto.PolicyListItemDto;
-import com.jangsacartel.biz.policy.dto.PolicyPagedResponseDto;
-import com.jangsacartel.biz.policy.dto.PolicySearchRequestDto;
+import com.jangsacartel.biz.policy.dto.PolicyPagedResponseDTO;
+import com.jangsacartel.biz.policy.dto.PolicySearchRequestDTO;
 import com.jangsacartel.biz.policy.service.PolicyService;
 
 import io.swagger.annotations.Api;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -41,7 +38,7 @@ public class PolicyController {
         @ApiResponse(
             code = 200,
             message = "정책 목록 조회 성공",
-            response = PolicyPagedResponseDto.class
+            response = PolicyPagedResponseDTO.class
         ),
         @ApiResponse(code = 400, message = "잘못된 요청 파라미터"),
         @ApiResponse(code = 401, message = "Unauthorized"),
@@ -68,7 +65,7 @@ public class PolicyController {
     ) {
 
     	// 쿼리 파라미터를 서비스 계층에서 사용하는 검색 DTO로 변환
-        PolicySearchRequestDto cond = PolicySearchRequestDto.builder()
+    	PolicySearchRequestDTO cond = PolicySearchRequestDTO.builder()
                 .pageIndex(page)
                 .pageUnit(size)
                 .domainLabel(domain)
@@ -76,7 +73,7 @@ public class PolicyController {
                 .build();
 
      // 외부 Bizinfo API 호출 + 결과 가공은 서비스에서 처리
-        PolicyPagedResponseDto result = policyService.searchPolicies(cond);
+        PolicyPagedResponseDTO result = policyService.searchPolicies(cond);
         
         return ResponseEntity.ok(result);
     }
