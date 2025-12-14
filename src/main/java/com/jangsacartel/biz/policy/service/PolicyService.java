@@ -1,12 +1,9 @@
 package com.jangsacartel.biz.policy.service;
 
-import com.jangsacartel.biz.policy.dto.PolicyListItemDto;
-import com.jangsacartel.biz.policy.dto.PolicyPagedResponseDto;
-import com.jangsacartel.biz.policy.dto.PolicySearchRequestDto;
-
-import java.util.List;
+import com.jangsacartel.biz.policy.dto.PolicyPagedResponseDTO;
+import com.jangsacartel.biz.policy.dto.PolicySearchRequestDTO;
 
 public interface PolicyService {
 
-	PolicyPagedResponseDto searchPolicies(PolicySearchRequestDto cond);
+	PolicyPagedResponseDTO searchPolicies(PolicySearchRequestDTO cond);
 }
