@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.jangsacartel.biz.ai.mapper.AiMapper">
+
+  <select id="selectPostsByDateRange" resultType="com.jangsacartel.biz.ai.dto.PostLiteDTO">
+    SELECT
+      post_id AS postId,
+      title,
+      content
+    FROM Post
+    WHERE created_at <![CDATA[>=]]> #{start}
+      AND created_at <![CDATA[<]]> #{end}
+      AND deleted_at IS NULL
+    ORDER BY created_at DESC
+    LIMIT #{limit}
+  </select>
+
+</mapper>
