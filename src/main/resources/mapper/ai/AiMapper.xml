@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -6,16 +6,20 @@
 <mapper namespace="com.jangsacartel.biz.ai.mapper.AiMapper">
 
   <select id="selectPostsByDateRange" resultType="com.jangsacartel.biz.ai.dto.PostLiteDTO">
-    SELECT
-      post_id AS postId,
-      title,
-      content
-    FROM Post
-    WHERE created_at <![CDATA[>=]]> #{start}
-      AND created_at <![CDATA[<]]> #{end}
-      AND deleted_at IS NULL
-    ORDER BY created_at DESC
-    LIMIT #{limit}
+	SELECT
+	    p.post_id   AS postId,
+	    MAX(p.title) AS title,
+ 		MAX(p.content) AS content
+	  FROM Post p
+	  LEFT JOIN Like_Post lp
+	    ON lp.post_id = p.post_id
+	  WHERE
+	    p.deleted_at IS NULL
+	    AND p.created_at <![CDATA[ >= ]]> #{start}
+	    AND p.created_at <![CDATA[ < ]]> #{end}
+	  GROUP BY p.post_id
+	  ORDER BY COUNT(lp.post_id) DESC, MAX(p.created_at) DESC
+	  LIMIT #{limit}
   </select>
 
 </mapper>
