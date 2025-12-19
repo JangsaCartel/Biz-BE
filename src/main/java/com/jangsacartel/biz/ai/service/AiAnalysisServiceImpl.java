@@ -81,11 +81,11 @@ public class AiAnalysisServiceImpl implements AiAnalysisService {
         String weekLabel = WeekLabelUtil.buildLabel(start);
 
         // 데이터가 없으면 AI 서버 호출하지 않고 기본 응답
-        if (posts == null || posts.isEmpty()) {
+        if (posts == null || posts.size() < 10) {
             BizAiWeeklyResponseDTO empty = new BizAiWeeklyResponseDTO();
             empty.setWeekLabel(weekLabel);
             empty.setTopKeywords(Collections.emptyList());
-            empty.setWordcloudPngBase64(null); 
+            empty.setWordcloudPngBase64(null);
             return empty;
         }
 
