@@ -120,6 +120,7 @@ public class AiChatProxyServiceImpl implements AiChatProxyService {
         conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
         conn.setRequestProperty("Accept", "text/event-stream");
         conn.setRequestProperty("Cache-Control", "no-cache");
+        conn.setRequestProperty("Accept-Encoding", "identity");
 
         if (aiApiKey != null && !aiApiKey.trim().isEmpty() && !aiApiKey.trim().startsWith("${")) {
             conn.setRequestProperty("X-AI-KEY", aiApiKey.trim());
@@ -131,16 +132,24 @@ public class AiChatProxyServiceImpl implements AiChatProxyService {
             os.flush();
         }
 
-        int code;
+        int code = -1;
         InputStream aiStream = null;
 
         try {
             code = conn.getResponseCode();
-            aiStream = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
 
-            // ✅ errorStream이 null인 케이스 방어 (여기서 NPE로 500 자주 남)
+            // 2xx가 아니면: SSE가 아닌 에러(JSON)가 올 가능성이 높다 → SSE error로 감싸서 내려보내기
+            if (code < 200 || code >= 300) {
+                aiStream = conn.getErrorStream();
+
+                String errBody = (aiStream != null) ? readSmallText(aiStream, 16 * 1024) : "";
+                writeSseError(resp, code, "Upstream HTTP " + code + (errBody.isEmpty() ? "" : " / " + errBody));
+                return;
+            }
+
+            aiStream = conn.getInputStream();
             if (aiStream == null) {
-                writeSseError(resp, "Upstream returned HTTP " + code + " with empty body");
+            	writeSseError(resp, 502, "Upstream returned HTTP " + code + " with empty body");
                 return;
             }
 
@@ -152,20 +161,45 @@ public class AiChatProxyServiceImpl implements AiChatProxyService {
 
                 while ((n = bis.read(buf)) != -1) {
                     clientOut.write(buf, 0, n);
-                    clientOut.flush();
+                    clientOut.flush(); // chunk 즉시 flush
                 }
             }
         } catch (IOException e) {
-            writeSseError(resp, "Proxy error: " + e.getMessage());
+        	writeSseError(resp, 502, "Proxy error: " + e.getMessage());
         } finally {
             try { if (aiStream != null) aiStream.close(); } catch (Exception ignore) {}
             conn.disconnect();
         }
     }
+    
+    private String readSmallText(InputStream in, int limitBytes) throws IOException {
+        byte[] buf = new byte[4096];
+        int total = 0;
+        StringBuilder sb = new StringBuilder();
 
-    private void writeSseError(HttpServletResponse resp, String msg) throws IOException {
-        String payload = "{\"done\":true,\"error\":" + toJsonString(msg) + "}\n\n";
-        String sse = "data: " + payload;
+        while (true) {
+            int n = in.read(buf);
+            if (n == -1) break;
+            if (total + n > limitBytes) {
+                n = limitBytes - total;
+            }
+            sb.append(new String(buf, 0, n, StandardCharsets.UTF_8));
+            total += n;
+            if (total >= limitBytes) break;
+        }
+        return sb.toString().trim();
+    }
+
+    private void writeSseError(HttpServletResponse resp, int code, String msg) throws IOException {
+        String json =
+            "{"
+                + "\"done\":true,"
+                + "\"error\":{"
+                + "\"code\":" + code + ","
+                + "\"message\":" + toJsonString(msg)
+                + "}"
+                + "}";
+        String sse = "data: " + json + "\n\n";
         resp.getOutputStream().write(sse.getBytes(StandardCharsets.UTF_8));
         resp.getOutputStream().flush();
     }
