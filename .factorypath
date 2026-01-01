@@ -1,0 +1,5 @@
+<factorypath>
+    <factorypathentry kind="PLUGIN" id="net.harawata.mybatipse" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="WKSPJAR" id="/Biz-BE/WEB-INF/lib/lombok.jar" enabled="true" runInBatchMode="false"/>
+</factorypath>
