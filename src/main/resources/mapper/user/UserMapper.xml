@@ -48,4 +48,40 @@
         FROM User_Info
         WHERE business_reg_no = #{businessRegNo}
     </select>
+
+    <select id="findProfileByUserId" resultType="com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO">
+        SELECT
+            u.user_id AS userId,
+            u.nickname AS nickname,
+            ui.user_storeName AS userStoreName,
+            ui.region AS region
+        FROM User u
+                 LEFT JOIN User_Info ui ON u.user_id = ui.user_id
+        WHERE u.user_id = #{userId}
+    </select>
+
+    <update id="updateNickname">
+        UPDATE User
+        SET nickname = #{nickname}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="findPostsByUserId" resultType="com.jangsacartel.biz.user.dto.MyPostDTO">
+        SELECT
+            p.post_id      AS postId,
+            p.title        AS title,
+            p.created_at   AS createdAt,
+            c.name         AS categoryName
+        FROM `게시글` p
+                 JOIN `게시판 카테고리` c ON p.category_id = c.category_id
+        WHERE p.user_id = #{userId}
+          AND p.deleted_at IS NULL
+        ORDER BY p.created_at DESC
+    </select>
+
+    <update id="deletePost">
+        UPDATE `게시글`
+        SET deleted_at = NOW()
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </update>
 </mapper>
