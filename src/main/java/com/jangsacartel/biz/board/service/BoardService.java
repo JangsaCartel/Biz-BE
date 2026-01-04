@@ -8,6 +8,7 @@ import com.jangsacartel.biz.board.dto.CommentDTO;
 import com.jangsacartel.biz.board.dto.FileDTO;
 import com.jangsacartel.biz.board.dto.LikeCommentDTO;
 import com.jangsacartel.biz.board.dto.LikePostDTO;
+import com.jangsacartel.biz.board.dto.PostUpdateRequestDTO;
 
 public interface BoardService {
     // 게시글(Post) 관련 서비스 메서드
@@ -53,4 +54,7 @@ public interface BoardService {
     List<BoardDTO> findHotBoardPosts(int page, int pageSize);
     
     int getHotBoardPostsCount();
+
+    // 유저 페이지 - 게시글 수정
+    void updatePost(int postId, int userId, PostUpdateRequestDTO requestDTO);
 }

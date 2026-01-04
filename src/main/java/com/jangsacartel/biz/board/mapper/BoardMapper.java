@@ -10,6 +10,7 @@ import com.jangsacartel.biz.board.dto.CommentDTO;
 import com.jangsacartel.biz.board.dto.FileDTO;
 import com.jangsacartel.biz.board.dto.LikeCommentDTO;
 import com.jangsacartel.biz.board.dto.LikePostDTO;
+import com.jangsacartel.biz.board.dto.PostUpdateRequestDTO;
 
 public interface BoardMapper {
 
@@ -56,4 +57,10 @@ public interface BoardMapper {
     List<BoardDTO> selectHotBoardPosts(@Param("offset") int offset, @Param("limit") int limit);
     
     int countHotBoardPosts();
+
+    // 게시글 수정 (작성자 본인 확인 기능이 포함된 수정 메서드)
+    // 리턴값 int: 수정 성공 시 1, 실패(본인 글 아님/글 없음) 시 0 반환
+    int updatePostByUser(@Param("postId") int postId,
+        @Param("userId") int userId,
+        @Param("dto") PostUpdateRequestDTO dto);
 }

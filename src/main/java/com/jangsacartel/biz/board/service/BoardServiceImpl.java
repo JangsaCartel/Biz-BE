@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jangsacartel.biz.board.dto.BoardDTO;
 import com.jangsacartel.biz.board.dto.CategoryDTO;
@@ -11,6 +12,7 @@ import com.jangsacartel.biz.board.dto.CommentDTO;
 import com.jangsacartel.biz.board.dto.FileDTO;
 import com.jangsacartel.biz.board.dto.LikeCommentDTO;
 import com.jangsacartel.biz.board.dto.LikePostDTO;
+import com.jangsacartel.biz.board.dto.PostUpdateRequestDTO;
 import com.jangsacartel.biz.board.mapper.BoardMapper;
 
 @Service
@@ -164,5 +166,18 @@ public class BoardServiceImpl implements BoardService {
 	public int getHotBoardPostsCount() {
 		int totalCount = boardMapper.countHotBoardPosts();
 		return Math.min(totalCount, 100);
+	}
+
+	// 유저 페이지 - 게시글 수정
+	@Override
+	@Transactional
+	public void updatePost(int postId, int userId, PostUpdateRequestDTO requestDTO) {
+		// 본인 확인 및 수정 쿼리 실행
+		int result = boardMapper.updatePostByUser(postId, userId, requestDTO);
+
+		// 수정된 행이 0개라면 -> 글이 없거나, 작성자가 아님
+		if (result == 0) {
+			throw new IllegalArgumentException("게시글이 존재하지 않거나 수정 권한이 없습니다.");
+		}
 	}
 }
