@@ -68,13 +68,13 @@ public class BoardController {
 			@ApiResponse(code = 401, message = "인증 정보가 유효하지 않습니다."),
 			@ApiResponse(code = 409, message = "이미 좋아요를 누른 게시글입니다.")
 	})
-	public ResponseEntity<?> likePost(@PathVariable("postId") int postId, Authentication authentication) {
+	public ResponseEntity<?> likePost(@PathVariable("postId") int postId, HttpServletRequest request) {
 		try {
-			Object principal = authentication.getPrincipal();
-			if (!(principal instanceof Claims)) {
-				return new ResponseEntity<>("인증 정보가 유효하지 않습니다.", HttpStatus.UNAUTHORIZED);
-			}
-			Claims claims = (Claims) principal;
+			String token = request.getHeader("Authorization");
+            if (token == null) {
+                return new ResponseEntity<>("Token is missing", HttpStatus.UNAUTHORIZED);
+            }
+            Claims claims = jwtUtil.validateToken(token);
 			Number userIdNumber = claims.get("userId", Number.class);
 
 			if (userIdNumber == null) {
