@@ -15,7 +15,7 @@ public interface BoardMapper {
 
     // Post
     void insertPost(BoardDTO board);
-    BoardDTO findPostById(int postId);
+    BoardDTO findPostById(@Param("postId") int postId, @Param("userId") Integer userId);
     List<BoardDTO> findAllPosts();
     void updatePost(BoardDTO board);
     void deletePost(int postId);

@@ -52,8 +52,22 @@ public class BoardController {
 			@ApiResponse(code = 200, message = "Successfully retrieved post details", response = BoardDTO.class),
 			@ApiResponse(code = 404, message = "Post not found")
 	})
-	public ResponseEntity<BoardDTO> getPostById(@PathVariable("postId") int postId) {
-		BoardDTO post = boardService.findPostById(postId);
+	public ResponseEntity<BoardDTO> getPostById(@PathVariable("postId") int postId, HttpServletRequest request) {
+		Integer userId = null;
+		try {
+			String token = request.getHeader("Authorization");
+			if (token != null && !token.isEmpty()) {
+				Claims claims = jwtUtil.validateToken(token);
+				Number userIdNumber = claims.get("userId", Number.class);
+				if (userIdNumber != null) {
+					userId = userIdNumber.intValue();
+				}
+			}
+		} catch (Exception e) {
+			logger.warn("Could not validate token for getPostById. Proceeding as unauthenticated. Error: {}", e.getMessage());
+		}
+
+		BoardDTO post = boardService.findPostById(postId, userId);
 		if (post != null) {
 			return new ResponseEntity<>(post, HttpStatus.OK);
 		} else {

@@ -22,7 +22,13 @@
             p.user_id,
             u.nickname,
             (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
-            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count,
+            <if test="userId != null">
+                EXISTS(SELECT 1 FROM Like_Post WHERE post_id = p.post_id AND user_id = #{userId}) as is_liked
+            </if>
+            <if test="userId == null">
+                false as is_liked
+            </if>
         FROM 
             Post p
         JOIN 
