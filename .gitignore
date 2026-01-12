@@ -1,8 +1,8 @@
 ##############################
-# ? �⺻ ����
+# ? 기본 설정
 ##############################
 
-# OS�� ���ʿ� ����
+# OS별 불필요 파일
 .DS_Store
 Thumbs.db
 ehthumbs.db
@@ -11,24 +11,25 @@ $RECYCLE.BIN/
 *.lnk
 
 ##############################
-# ? Eclipse ����
+# ? Eclipse 관련
 ##############################
 
-# Eclipse ������Ʈ ��Ÿ����
+# Eclipse 프로젝트 메타데이터
 .project
 .classpath
+.factorypath
 .settings/
 *.launch
 *.buildship/
 
-# Eclipse Buildship �÷����� ĳ��
+# Eclipse Buildship 플러그인 캐시
 .buildship/
 
 ##############################
-# ?? Gradle ����
+# ?? Gradle 관련
 ##############################
 
-# Gradle ĳ�� �� ���� �����
+# Gradle 캐시 및 빌드 파일
 .gradle/
 build/
 bin/
@@ -36,33 +37,33 @@ out/
 !gradle/wrapper/gradle-wrapper.jar
 !gradle/wrapper/gradle-wrapper.properties
 
-# Gradle GUI ����
+# Gradle GUI 관련
 gradle-app.setting
 .gradletasknamecache
 
 ##############################
-# ? Java ����
+# ? Java 관련
 ##############################
 
-# �����ϵ� Ŭ����
+# 컴파일된 클래스
 *.class
 
-# �α� ����
+# 로그 파일
 *.log
 logs/
 
-# Java �� ���� ����
+# Java 힙 덤프 파일
 *.hprof
 
-# �ӽ� ����
+# 임시 파일
 *.tmp
 *.bak
 
 ##############################
-# ? ��Ű¡ �����
+# ? 패키징 파일
 ##############################
 
-#  WAR, EAR �� ���� ��ī�̺�
+#  WAR, EAR 등 배포 아카이브
 *.war
 *.ear
 *.nar
@@ -71,23 +72,23 @@ logs/
 *.rar
 
 ##############################
-# ? IDE ���� (VSCode ��)
+# ? IDE 관련 (VSCode 등)
 ##############################
 
-# VSCode ����
+# VSCode 관련
 .vscode/
 
-# IntelliJ ���� (Ȥ�� ȥ�� �� ���)
+# IntelliJ 관련 (혹은 사용할 경우)
 .idea/
 *.iml
 *.ipr
 *.iws
 
 ##############################
-# ? �ΰ��� ���� (���� ����)
+# ? 민감한 정보 (보안)
 ##############################
 
-# Spring Boot ���� (ȯ�濡 ���� �������� ����)
+# Spring Boot 관련 (환경에 따라 달라지는 정보)
 application.properties
 application.yml
 application-local.properties
@@ -97,27 +98,27 @@ src/main/resources/application.properties
 
 
 ##############################
-# ? ��Ÿ
+# ? 기타
 ##############################
 
-# �α�, �ӽ�, ĳ�� ���͸�
+# 로그, 임시, 캐시 디렉토리
 tmp/
 cache/
 
 ##############################
-# WEB-INF ���� ���� (����)
+# WEB-INF 관련 설정 (주의)
 ##############################
 
-# WEB-INF ���� ���� ��� ���빰(*)�� �⺻������ �����մϴ�.
+# WEB-INF 관련 파일들은 보통(*) 기본적으로 무시합니다.
 WEB-INF/*
 
-# ���� ó��: �ݵ�� Git�� �����ؾ� �ϴ� �ҽ� �ڵ� �� ���� ����
+# 예외 처리: 반드시 Git에 포함해야 하는 리소스 코드 및 설정 파일
 !WEB-INF/web.xml
-!WEB-INF/views/   # JSP ���� �� �� �ҽ� �ڵ带 ��� ������ �����ؾ� �մϴ�.
+!WEB-INF/views/   # JSP 파일 등 뷰 리소스 코드를 쓰는 경우에 포함
 
-# ���� �����: ��������� �����մϴ�.
-WEB-INF/lib/      # ������ ���̺귯��
-WEB-INF/classes/  # �����ϵ� .class ����
+# 무시 목록: 라이브러리나 컴파일된 클래스는 무시
+WEB-INF/lib/      # 라이브러리 파일
+WEB-INF/classes/  # 컴파일된 .class 파일
 
 # 모든 properties 파일 무시 (보안/설정 파일)
 *.properties

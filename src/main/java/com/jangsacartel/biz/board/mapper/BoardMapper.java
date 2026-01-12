@@ -15,7 +15,7 @@ public interface BoardMapper {
 
     // Post
     void insertPost(BoardDTO board);
-    BoardDTO findPostById(int postId);
+    BoardDTO findPostById(@Param("postId") int postId, @Param("userId") Integer userId);
     List<BoardDTO> findAllPosts();
     void updatePost(BoardDTO board);
     void deletePost(int postId);
@@ -26,6 +26,7 @@ public interface BoardMapper {
     // Comment
     void insertComment(CommentDTO comment);
     List<CommentDTO> findCommentsByPostId(int postId);
+    CommentDTO findCommentById(int commentId);
     void updateComment(CommentDTO comment);
     void deleteComment(int commentId);
 
@@ -44,6 +45,7 @@ public interface BoardMapper {
     void insertCommentLike(LikeCommentDTO likeComment);
     void deleteCommentLike(LikeCommentDTO likeComment);
     int countCommentLikes(int commentId);
+    int findCommentLikeByUser(@Param("commentId") int commentId, @Param("userId") int userId);
     
     List<BoardDTO> findHotPosts(int limit);
     
