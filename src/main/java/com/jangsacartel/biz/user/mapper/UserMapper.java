@@ -2,6 +2,7 @@ package com.jangsacartel.biz.user.mapper;
 
 import java.util.List;
 
+import com.jangsacartel.biz.user.dto.MyCommentDTO;
 import com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO;
 import com.jangsacartel.biz.user.dto.MyPostDTO;
 import com.jangsacartel.biz.user.entity.UserVO;
@@ -44,4 +45,10 @@ public interface UserMapper {
 
 	// 마이페이지 게시글 삭제
 	void deletePost(@Param("postId") Long postId, @Param("userId") Long userId);
+
+	// 내가 쓴 댓글
+	List<MyCommentDTO> findCommentsByUserId(Long userId);
+
+	// 내가 좋아요한 글
+	List<MyPostDTO> findLikedPostsByUserId(Long userId);
 }

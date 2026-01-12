@@ -1,5 +1,6 @@
 package com.jangsacartel.biz.user.service;
 
+import com.jangsacartel.biz.user.dto.MyCommentDTO;
 import com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO;
 import com.jangsacartel.biz.user.dto.MyPostDTO;
 import com.jangsacartel.biz.user.entity.UserVO;
@@ -51,6 +52,18 @@ public class UserService {
 			throw new IllegalArgumentException("존재하지 않는 회원입니다.");
 		}
 		return user.getUserId();
+	}
+
+	// 내가 쓴 댓글 가져오기
+	@Transactional(readOnly = true)
+	public List<MyCommentDTO> getMyComments(Long userId) {
+		return userMapper.findCommentsByUserId(userId);
+	}
+
+	// 내가 좋아요한 글 가져오기
+	@Transactional(readOnly = true)
+	public List<MyPostDTO> getMyLikedPosts(Long userId) {
+		return userMapper.findLikedPostsByUserId(userId);
 	}
 
 }

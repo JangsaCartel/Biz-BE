@@ -5,6 +5,7 @@ import java.util.List;
 import com.jangsacartel.biz.auth.dto.UserResponseDTO;
 import com.jangsacartel.biz.auth.service.KakaoAuthService;
 import com.jangsacartel.biz.global.jwt.filter.CustomUserDetails;
+import com.jangsacartel.biz.user.dto.MyCommentDTO;
 import com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO;
 import com.jangsacartel.biz.user.dto.MyPostDTO;
 import com.jangsacartel.biz.user.dto.NicknameUpdateRequestDTO;
@@ -33,7 +34,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-
 @Api(tags = "유저 컨트롤러")
 public class UserController {
 
@@ -133,6 +133,34 @@ public class UserController {
 		userService.deletePost(userId, postId);
 
 		return ResponseEntity.ok("게시글이 삭제되었습니다.");
+	}
+
+	// 내가 쓴 댓글 조회
+	@ApiOperation(value = "내가 쓴 댓글 조회")
+	@GetMapping("/comments")
+	public ResponseEntity<List<MyCommentDTO>> getMyComments(
+		@ApiIgnore @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+		// 토큰에서 ID 추출
+		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
+
+		// 데이터 반환
+		return ResponseEntity.ok(userService.getMyComments(userId));
+	}
+
+	// 내가 좋아요한 글 조회
+	@ApiOperation(value = "좋아요한 게시글 조회")
+	@GetMapping("/likes")
+	public ResponseEntity<List<MyPostDTO>> getMyLikedPosts(
+		@ApiIgnore @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
+
+		return ResponseEntity.ok(userService.getMyLikedPosts(userId));
 	}
 
 }
