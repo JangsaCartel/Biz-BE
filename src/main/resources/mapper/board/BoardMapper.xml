@@ -20,7 +20,15 @@
             p.deleted_at,
             p.modified_at,
             p.user_id,
-            u.nickname
+            u.nickname,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count,
+            <if test="userId != null">
+                EXISTS(SELECT 1 FROM Like_Post WHERE post_id = p.post_id AND user_id = #{userId}) as is_liked
+            </if>
+            <if test="userId == null">
+                false as is_liked
+            </if>
         FROM 
             Post p
         JOIN 
@@ -55,12 +63,34 @@
 
     <!-- ==================== Comment ==================== -->
     <insert id="insertComment" parameterType="com.jangsacartel.biz.board.dto.CommentDTO">
-        INSERT INTO Comment (post_id, parent_comment_id, content, created_at)
-        VALUES (#{postId}, #{parentCommentId}, #{content}, NOW())
+        INSERT INTO Comment (post_id, parent_comment_id, content, created_at, user_id)
+        VALUES (#{postId}, #{parentCommentId}, #{content}, NOW(), #{userId})
     </insert>
 
     <select id="findCommentsByPostId" resultType="com.jangsacartel.biz.board.dto.CommentDTO">
-        SELECT * FROM Comment WHERE post_id = #{postId} AND deleted_at IS NULL ORDER BY created_at ASC
+        SELECT 
+            c.*,
+            u.nickname
+        FROM 
+            Comment c
+        JOIN 
+            User u ON c.user_id = u.user_id
+        WHERE 
+            c.post_id = #{postId} AND c.deleted_at IS NULL 
+        ORDER BY 
+            c.created_at ASC
+    </select>
+
+    <select id="findCommentById" resultType="com.jangsacartel.biz.board.dto.CommentDTO">
+        SELECT 
+            c.*,
+            u.nickname
+        FROM 
+            Comment c
+        JOIN 
+            User u ON c.user_id = u.user_id
+        WHERE 
+            c.comment_id = #{commentId} AND c.deleted_at IS NULL
     </select>
 
     <update id="updateComment" parameterType="com.jangsacartel.biz.board.dto.CommentDTO">
@@ -120,6 +150,10 @@
 
     <select id="countCommentLikes" resultType="int">
         SELECT COUNT(*) FROM Like_Comment WHERE comment_id = #{commentId}
+    </select>
+    
+    <select id="findCommentLikeByUser" resultType="int">
+        SELECT COUNT(*) FROM Like_Comment WHERE comment_id = #{commentId} AND user_id = #{userId}
     </select>
     
     <select id="findHotPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">

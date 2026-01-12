@@ -16,18 +16,22 @@ import lombok.NoArgsConstructor;
 @ApiModel(description = "댓글 정보를 담는 DTO")
 public class CommentDTO {
 	@ApiModelProperty(value = "댓글 ID", example = "1", required = true)
-	private int comment_id;
+	private int commentId;
 	@ApiModelProperty(value = "게시글 ID", example = "1", required = true)
-	private int post_id;
+	private int postId;
 	@ApiModelProperty(value = "부모 댓글 ID", example = "1")
-	private int parent_comment_id;
+	private Integer parentCommentId;
 	@ApiModelProperty(value = "댓글 내용", example = "댓글 내용입니다.", required = true)
 	private String content;
 	@ApiModelProperty(value = "작성일", example = "2024-07-19T10:00:00.000+00:00")
-	private Date created_at;
+	private Date createdAt;
 	@ApiModelProperty(value = "수정일", example = "2024-07-19T10:00:00.000+00:00")
-	private Date modified_at;
+	private Date modifiedAt;
 	@ApiModelProperty(value = "삭제일", example = "2024-07-19T10:00:00.000+00:00")
-	private Date deleted_at;
+	private Date deletedAt;
+	@ApiModelProperty(value = "유저 ID", example = "1", required = true)
+	private Integer userId;
+	@ApiModelProperty(value = "작성자 닉네임", example = "장사꾼")
+	private String nickname;
 
 }

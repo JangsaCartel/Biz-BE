@@ -43,6 +43,8 @@ public class BoardDTO {
 	private int likeCount;
 	@ApiModelProperty(value = "댓글 수", example = "5")
 	private int commentCount;
+	@ApiModelProperty(value = "현재 사용자의 좋아요 여부", example = "true")
+	private boolean isLiked;
 	
 
 }
