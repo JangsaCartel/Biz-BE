@@ -1,25 +1,23 @@
 package com.jangsacartel.biz.notification.domain;
 
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import lombok.Builder;
-import lombok.Getter;
-
-@Getter
-@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NotificationEvent {
-	private final String eventId;          
-    private final NotificationType type;
+    private String eventId;
+    private NotificationType type;
 
-    private final Integer receiverUserId;  
-    private final Integer actorUserId;     
+    private Integer receiverUserId;
+    private Integer actorUserId;
 
-    private final String title;
-    private final String body;
-    private final String link;            
+    private String title;
+    private String message;
+    private String createdAt;
 
-    private final Integer postId;        
-    private final Integer commentId;       
-
-    private final LocalDateTime createdAt;
+    private Integer postId;
+    private Integer commentId;
 }
