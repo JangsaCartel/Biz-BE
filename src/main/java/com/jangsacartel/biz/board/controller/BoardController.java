@@ -1,8 +1,6 @@
 package com.jangsacartel.biz.board.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
@@ -24,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.jangsacartel.biz.board.dto.BoardDTO;
 import com.jangsacartel.biz.board.dto.PostUpdateRequestDTO;
+import com.jangsacartel.biz.board.dto.BoardListResponseDTO;
+import com.jangsacartel.biz.board.dto.MainPageResponseDTO;
 import com.jangsacartel.biz.board.service.BoardService;
 import com.jangsacartel.biz.global.jwt.filter.CustomUserDetails;
 import com.jangsacartel.biz.global.jwt.util.JwtUtil;
@@ -35,6 +35,9 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 
 @RestController
 @RequestMapping("/api")
@@ -54,8 +57,26 @@ public class BoardController {
 
 	@GetMapping("/board/{postId}")
 	@ApiOperation(value="게시글 상세 조회", notes="게시글 ID로 특정 게시글의 상세 정보를 조회합니다.")
-	public ResponseEntity<BoardDTO> getPostById(@PathVariable("postId") int postId) {
-		BoardDTO post = boardService.findPostById(postId);
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successfully retrieved post details", response = BoardDTO.class),
+			@ApiResponse(code = 404, message = "Post not found")
+	})
+	public ResponseEntity<BoardDTO> getPostById(@PathVariable("postId") int postId, HttpServletRequest request) {
+		Integer userId = null;
+		try {
+			String token = request.getHeader("Authorization");
+			if (token != null && !token.isEmpty()) {
+				Claims claims = jwtUtil.validateToken(token);
+				Number userIdNumber = claims.get("userId", Number.class);
+				if (userIdNumber != null) {
+					userId = userIdNumber.intValue();
+				}
+			}
+		} catch (Exception e) {
+			logger.warn("Could not validate token for getPostById. Proceeding as unauthenticated. Error: {}", e.getMessage());
+		}
+
+		BoardDTO post = boardService.findPostById(postId, userId);
 		if (post != null) {
 			return new ResponseEntity<>(post, HttpStatus.OK);
 		} else {
@@ -65,13 +86,18 @@ public class BoardController {
 
 	@PostMapping("/board/{postId}/like")
 	@ApiOperation(value="게시글 좋아요", notes="게시글에 좋아요를 누릅니다. 중복은 허용되지 않습니다.")
-	public ResponseEntity<?> likePost(@PathVariable("postId") int postId, Authentication authentication) {
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "좋아요 처리가 완료되었습니다."),
+			@ApiResponse(code = 401, message = "인증 정보가 유효하지 않습니다."),
+			@ApiResponse(code = 409, message = "이미 좋아요를 누른 게시글입니다.")
+	})
+	public ResponseEntity<?> likePost(@PathVariable("postId") int postId, HttpServletRequest request) {
 		try {
-			Object principal = authentication.getPrincipal();
-			if (!(principal instanceof Claims)) {
-				return new ResponseEntity<>("인증 정보가 유효하지 않습니다.", HttpStatus.UNAUTHORIZED);
-			}
-			Claims claims = (Claims) principal;
+			String token = request.getHeader("Authorization");
+            if (token == null) {
+                return new ResponseEntity<>("Token is missing", HttpStatus.UNAUTHORIZED);
+            }
+            Claims claims = jwtUtil.validateToken(token);
 			Number userIdNumber = claims.get("userId", Number.class);
 
 			if (userIdNumber == null) {
@@ -89,6 +115,11 @@ public class BoardController {
 	
 	@PostMapping("/posts")
 	@ApiOperation(value="게시글 등록", notes="새로운 게시글을 등록합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "게시글이 성공적으로 등록되었습니다.", response = BoardDTO.class),
+        @ApiResponse(code = 401, message = "인증 정보가 유효하지 않습니다."),
+        @ApiResponse(code = 500, message = "서버 오류로 게시글 등록에 실패했습니다.")
+})
     public ResponseEntity<BoardDTO> createPost(@RequestBody BoardDTO board, HttpServletRequest request) {
         try {
 			String token = request.getHeader("Authorization");
@@ -116,17 +147,14 @@ public class BoardController {
 
 	@GetMapping
 	@ApiOperation(value="메인 페이지", notes="메인 페이지에 필요한 데이터를 조회합니다.")
-	public ResponseEntity<Map<String, Object>> getMainPage() {
-		Map<String, Object> response = new HashMap<>();
-
-		// Hot 게시판 (카테고리 ID 1, 최근 3일간 좋아요 가장 많은 글 3개)
+    @ApiResponse(code = 200, message = "Successfully retrieved main page data", response = MainPageResponseDTO.class)
+	public ResponseEntity<MainPageResponseDTO> getMainPage() {
 		List<BoardDTO> hotPosts = boardService.findHotPosts(3);
-		response.put("hot", hotPosts);
+		List<BoardDTO> freePosts = boardService.findRecentPosts(2, 3);
+		List<BoardDTO> infoPosts = boardService.findRecentPosts(3, 3);
+		List<BoardDTO> localPosts = boardService.findRecentPosts(4, 3);
 
-		// 나머지 게시판 (최신 글 3개씩)
-		response.put("free", boardService.findRecentPosts(2, 3));
-		response.put("info", boardService.findRecentPosts(3, 3));
-		response.put("local", boardService.findRecentPosts(4, 3));
+        MainPageResponseDTO response = new MainPageResponseDTO(hotPosts, freePosts, infoPosts, localPosts);
 
 		return ResponseEntity.ok(response);
 	}
@@ -136,61 +164,57 @@ public class BoardController {
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
-	public ResponseEntity<Map<String, Object>> getHotBoardPage(@RequestParam(defaultValue = "1") int page) {
+    @ApiResponse(code = 200, message = "Successfully retrieved hot board posts", response = BoardListResponseDTO.class)
+	public ResponseEntity<BoardListResponseDTO> getHotBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> hotBoardPosts = boardService.findHotBoardPosts(page, 4);
 		int totalCount = boardService.getHotBoardPostsCount();
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("posts", hotBoardPosts);
-		response.put("totalCount", totalCount);
+        BoardListResponseDTO response = new BoardListResponseDTO(hotBoardPosts, totalCount);
 		
 		return ResponseEntity.ok(response);
 	}
 	
-	@GetMapping("free")
+	@GetMapping("/free")
 	@ApiOperation(value = "자유 게시판", notes = "자유 게시판의 게시글 목록을 조회합니다.")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
-	public ResponseEntity<Map<String, Object>> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
+    @ApiResponse(code = 200, message = "Successfully retrieved free board posts", response = BoardListResponseDTO.class)
+	public ResponseEntity<BoardListResponseDTO> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 4);
 		int totalCount = boardService.countPostsByCategory(2);
 		
-		Map<String, Object> response = new HashMap<>();
-		response.put("posts", freeBoardPosts);
-		response.put("totalCount", totalCount);
+        BoardListResponseDTO response = new BoardListResponseDTO(freeBoardPosts, totalCount);
 		
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("info")
+	@GetMapping("/info")
 	@ApiOperation(value = "정보 게시판", notes = "정보 게시판의 게시글 목록을 조회합니다.")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
-	public ResponseEntity<Map<String, Object>> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
+    @ApiResponse(code = 200, message = "Successfully retrieved info board posts", response = BoardListResponseDTO.class)
+	public ResponseEntity<BoardListResponseDTO> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 4);
 		int totalCount = boardService.countPostsByCategory(3);
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("posts", infoBoardPosts);
-		response.put("totalCount", totalCount);
+        BoardListResponseDTO response = new BoardListResponseDTO(infoBoardPosts, totalCount);
 		
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("local")
+	@GetMapping("/local")
 	@ApiOperation(value = "지역 게시판", notes = "지역 게시판의 게시글 목록을 조회합니다.")
 	@ApiImplicitParams({
 		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
 	})
-	public ResponseEntity<Map<String, Object>> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
+    @ApiResponse(code = 200, message = "Successfully retrieved local board posts", response = BoardListResponseDTO.class)
+	public ResponseEntity<BoardListResponseDTO> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
 		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 4);
 		int totalCount = boardService.countPostsByCategory(4);
 		
-		Map<String, Object> response = new HashMap<>();
-		response.put("posts", localBoardPosts);
-		response.put("totalCount", totalCount);
+		BoardListResponseDTO response = new BoardListResponseDTO(localBoardPosts, totalCount);
 
 		return ResponseEntity.ok(response);
 	}

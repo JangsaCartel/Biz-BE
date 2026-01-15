@@ -13,7 +13,7 @@ import com.jangsacartel.biz.board.dto.PostUpdateRequestDTO;
 public interface BoardService {
     // 게시글(Post) 관련 서비스 메서드
     void insertPost(BoardDTO board);
-    BoardDTO findPostById(int postId);
+    BoardDTO findPostById(int postId, Integer userId);
     List<BoardDTO> findAllPosts();
     void updatePost(BoardDTO board);
     void deletePost(int postId);

@@ -28,8 +28,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public BoardDTO findPostById(int postId) {
-        return boardMapper.findPostById(postId);
+    public BoardDTO findPostById(int postId, Integer userId) {
+        return boardMapper.findPostById(postId, userId);
     }
 
     @Override
