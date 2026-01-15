@@ -62,7 +62,9 @@
 
 
     <!-- ==================== Comment ==================== -->
-    <insert id="insertComment" parameterType="com.jangsacartel.biz.board.dto.CommentDTO">
+    <insert id="insertComment" parameterType="com.jangsacartel.biz.board.dto.CommentDTO" 
+    	useGeneratedKeys="true"
+        keyProperty="commentId">
         INSERT INTO Comment (post_id, parent_comment_id, content, created_at, user_id)
         VALUES (#{postId}, #{parentCommentId}, #{content}, NOW(), #{userId})
     </insert>

@@ -86,6 +86,10 @@ public class CommentServiceImpl implements CommentService {
         final int postId = comment.getPostId();
         final Integer parentCommentId = comment.getParentCommentId();
 
+        // 댓글 ID는 반드시 있어야 알림 이벤트도 안정적
+        final Integer newCommentId = comment.getCommentId();
+        if (newCommentId == null) return;
+
         // (A) 게시글 주인 조회
         BoardDTO post = boardMapper.findPostById(postId, null);
         if (post == null) return;
@@ -101,32 +105,22 @@ public class CommentServiceImpl implements CommentService {
         // (C) 수신자 결정 (중복 제거)
         Set<Integer> receivers = new HashSet<>();
 
-        // 1) 댓글/대댓글이면 무조건 post owner에게 (단, 작성자==post owner면 제외)
-        if (actorUserId != postOwnerId) {
-            receivers.add(postOwnerId);
-        }
+        // 1) post owner (작성자==post owner면 제외)
+        if (actorUserId != postOwnerId) receivers.add(postOwnerId);
 
-        // 2) 대댓글이면 parent comment owner에게도 (단, 작성자==parent owner면 제외)
-        if (parentOwnerId != null && actorUserId != parentOwnerId) {
-            receivers.add(parentOwnerId);
-        }
+        // 2) 대댓글이면 parent owner도 (작성자==parent owner면 제외)
+        if (parentOwnerId != null && actorUserId != parentOwnerId) receivers.add(parentOwnerId);
 
         if (receivers.isEmpty()) return;
 
-        // (D) 이벤트 만들고 notify (receiver마다 1건씩)
+        // (D) 이벤트 만들고 notify
         NotificationType type = (parentCommentId == null)
             ? NotificationType.COMMENT_CREATED
             : NotificationType.REPLY_CREATED;
 
-        Integer newCommentId = null;
-        try {
-            newCommentId = comment.getCommentId();
-        } catch (Exception ignore) {
-        }
-
         for (Integer receiverId : receivers) {
             NotificationEvent event = new NotificationEvent();
-            event.setEventId("cmt-" + (newCommentId != null ? newCommentId : UUID.randomUUID()));
+            event.setEventId("cmt-" + newCommentId);
             event.setType(type);
 
             event.setActorUserId(actorUserId);
@@ -145,4 +139,5 @@ public class CommentServiceImpl implements CommentService {
             notificationFacade.notify(event);
         }
     }
+
 }
