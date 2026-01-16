@@ -2,6 +2,7 @@ package com.jangsacartel.biz.board.dto;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -33,5 +34,9 @@ public class CommentDTO {
 	private Integer userId;
 	@ApiModelProperty(value = "작성자 닉네임", example = "장사꾼")
 	private String nickname;
+	@ApiModelProperty(value = "좋아요 수", example = "10")
+	private int likeCount;
+	@ApiModelProperty(value = "현재 사용자의 좋아요 여부", example = "true")
+	private boolean liked;
 
 }

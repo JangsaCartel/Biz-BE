@@ -30,8 +30,15 @@ public class CommentServiceImpl implements CommentService {
     private NotificationFacade notificationFacade;
 
     @Override
-    public List<CommentDTO> getCommentsByPostId(int postId) {
-        return boardMapper.findCommentsByPostId(postId);
+    public List<CommentDTO> getCommentsByPostId(int postId, Integer userId) {
+        List<CommentDTO> comments = boardMapper.findCommentsByPostId(postId);
+        if (userId != null) {
+            for (CommentDTO comment : comments) {
+                int likeCount = boardMapper.findCommentLikeByUser(comment.getCommentId(), userId);
+                comment.setLiked(likeCount > 0);
+            }
+        }
+        return comments;
     }
     
     @Override

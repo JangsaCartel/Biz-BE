@@ -37,8 +37,22 @@ public class CommentController {
 
     @ApiOperation(value = "게시글 댓글 목록 조회", notes = "특정 게시글에 달린 댓글 목록을 조회합니다.")
     @GetMapping("/posts/{postId}/comments")
-    public ResponseEntity<List<CommentDTO>> getCommentsByPostId(@PathVariable("postId") int postId) {
-        List<CommentDTO> comments = commentService.getCommentsByPostId(postId);
+    public ResponseEntity<List<CommentDTO>> getCommentsByPostId(@PathVariable("postId") int postId, HttpServletRequest request) {
+        Integer userId = null;
+        try {
+            String token = request.getHeader("Authorization");
+            if (token != null) {
+                Claims claims = jwtUtil.validateToken(token);
+                Number userIdNumber = claims.get("userId", Number.class);
+                if (userIdNumber != null) {
+                    userId = userIdNumber.intValue();
+                }
+            }
+        } catch (Exception e) {
+            // 토큰이 유효하지 않은 경우 등의 예외 처리, userId는 null으로 유지
+        }
+        
+        List<CommentDTO> comments = commentService.getCommentsByPostId(postId, userId);
         return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
