@@ -11,4 +11,6 @@ public class MyPostDTO {
 	private String title;
 	private Date createdAt;
 	private String categoryName;
+	private Long likeCount;
+	private Long commentCount;
 }

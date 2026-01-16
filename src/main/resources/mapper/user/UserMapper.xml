@@ -27,7 +27,9 @@
             p.post_id      AS postId,
             p.title        AS title,
             p.created_at   AS createdAt,
-            c.name         AS categoryName
+            c.name         AS categoryName,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) AS likeCount,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
         FROM Post p
                  JOIN Category c ON p.category_id = c.category_id
         WHERE p.user_id = #{userId}
@@ -106,7 +108,9 @@
             p.post_id      AS postId,
             p.title        AS title,
             p.created_at   AS createdAt,
-            cat.name       AS categoryName
+            cat.name       AS categoryName,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) AS likeCount,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
         FROM Like_Post lp
                  JOIN Post p ON lp.post_id = p.post_id
                  JOIN Category cat ON p.category_id = cat.category_id
