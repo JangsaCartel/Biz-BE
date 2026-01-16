@@ -24,10 +24,10 @@
             (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
             (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count,
             <if test="userId != null">
-                EXISTS(SELECT 1 FROM Like_Post WHERE post_id = p.post_id AND user_id = #{userId}) as is_liked
+                EXISTS(SELECT 1 FROM Like_Post WHERE post_id = p.post_id AND user_id = #{userId}) as liked
             </if>
             <if test="userId == null">
-                false as is_liked
+                false as liked
             </if>
         FROM 
             Post p
@@ -69,20 +69,27 @@
         VALUES (#{postId}, #{parentCommentId}, #{content}, NOW(), #{userId})
     </insert>
 
-    <select id="findCommentsByPostId" resultType="com.jangsacartel.biz.board.dto.CommentDTO">
-        SELECT 
-            c.*,
-            u.nickname
-        FROM 
-            Comment c
-        JOIN 
-            User u ON c.user_id = u.user_id
-        WHERE 
-            c.post_id = #{postId} AND c.deleted_at IS NULL 
-        ORDER BY 
-            c.created_at ASC
-    </select>
-
+        <select id="findCommentsByPostId" resultType="com.jangsacartel.biz.board.dto.CommentDTO">
+            SELECT
+                c.comment_id,
+                c.post_id,
+                c.parent_comment_id,
+                c.content,
+                c.created_at,
+                c.modified_at,
+                c.deleted_at,
+                c.user_id,
+                u.nickname,
+                (SELECT COUNT(*) FROM Like_Comment WHERE comment_id = c.comment_id) as like_count
+            FROM
+                Comment c
+            JOIN
+                User u ON c.user_id = u.user_id
+            WHERE
+                c.post_id = #{postId} AND c.deleted_at IS NULL
+            ORDER BY
+                c.created_at ASC
+        </select>
     <select id="findCommentById" resultType="com.jangsacartel.biz.board.dto.CommentDTO">
         SELECT 
             c.*,
