@@ -14,8 +14,14 @@ public class AdditionalUserInfoDTO {
 	private String nickname;
 
 	// User_Info 테이블용 (사업자 정보)
-	@ApiModelProperty(value = "지역", example = "서울 강남구")
-	private String region;
+	@ApiModelProperty(value = "시/도", example = "서울", required = true)
+	private String city;
+
+	@ApiModelProperty(value = "시/군/구", example = "강남구", required = true)
+	private String district;
+
+	@ApiModelProperty(value = "읍/면/동", example = "역삼동", required = true)
+	private String neighborhood;
 	
 	@ApiModelProperty(value = "상호명", example = "우리가게")
 	private String userStoreName;
