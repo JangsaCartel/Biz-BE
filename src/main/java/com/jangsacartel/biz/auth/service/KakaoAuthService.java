@@ -159,9 +159,9 @@ public class KakaoAuthService {
 
 			// 지역 정보 3개를 하나로 합치는 로직 추가 (공백 구분)
 			String fullRegion = String.format("%s %s %s",
-				additional.getCity().trim(),
-				additional.getDistrict().trim(),
-				additional.getNeighborhood().trim()
+				additional.getUserSido().trim(),   // getCity() -> getUserSido()
+				additional.getUserGugun().trim(),  // getDistrict() -> getUserGugun()
+				additional.getUserDong().trim()    // getNeighborhood() -> getUserDong()
 			).trim();
 
 			// [안전 장치] VARCHAR(32) 길이 초과 방지

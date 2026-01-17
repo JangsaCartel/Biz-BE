@@ -6,6 +6,8 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Data
 @ApiModel(description = "회원 추가 정보 DTO")
 public class AdditionalUserInfoDTO {
@@ -15,13 +17,13 @@ public class AdditionalUserInfoDTO {
 
 	// User_Info 테이블용 (사업자 정보)
 	@ApiModelProperty(value = "시/도", example = "서울", required = true)
-	private String city;
+	private String userSido;
 
 	@ApiModelProperty(value = "시/군/구", example = "강남구", required = true)
-	private String district;
+	private String userGugun;
 
 	@ApiModelProperty(value = "읍/면/동", example = "역삼동", required = true)
-	private String neighborhood;
+	private String userDong;
 	
 	@ApiModelProperty(value = "상호명", example = "우리가게")
 	private String userStoreName;
