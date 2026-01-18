@@ -145,6 +145,25 @@
         WHERE user_id = #{userId}
     </update>
 
+    <update id="deletePostsByUserId">
+        UPDATE Post
+        SET deleted_at = NOW()
+        WHERE user_id = #{userId}
+          AND deleted_at IS NULL
+    </update>
+
+    <update id="deleteCommentsByUserId">
+        UPDATE Comment
+        SET deleted_at = NOW()
+        WHERE user_id = #{userId}
+          AND deleted_at IS NULL
+    </update>
+
+    <delete id="deleteLikesByUserId">
+        DELETE FROM Like_Post
+        WHERE user_id = #{userId}
+    </delete>
+
     <update id="withdrawUser">
         UPDATE User
         SET deleted_at = NOW()

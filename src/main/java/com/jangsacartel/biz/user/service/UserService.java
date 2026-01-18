@@ -97,11 +97,19 @@ public class UserService {
 		userMapper.updateUserStoreName(userId, userStoreName);
 	}
 
-	// 회원 탈퇴
+	// 회원 탈퇴 (게시글, 댓글, 좋아요, 유저 정보 일괄 삭제)
 	@Transactional
 	public void withdrawUser(Long userId) {
-		// 추후 탈퇴 시 연관 데이터(User_Info 등) 처리 로직이 더 필요할 수 있음
-		// 현재는 User 테이블의 deleted_at 처리만 수행
+		// 1. 회원이 작성한 댓글 모두 삭제
+		userMapper.deleteCommentsByUserId(userId);
+
+		// 2. 회원이 작성한 게시글 모두 삭제
+		userMapper.deletePostsByUserId(userId);
+
+		// 3. 회원이 누른 좋아요 내역 삭제
+		userMapper.deleteLikesByUserId(userId);
+
+		// 4. 회원 정보 삭제 (Soft Delete - 계정 비활성화)
 		userMapper.withdrawUser(userId);
 	}
 

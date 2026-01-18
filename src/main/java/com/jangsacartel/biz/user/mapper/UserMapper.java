@@ -64,7 +64,14 @@ public interface UserMapper {
 	// 상호명 변경
 	void updateUserStoreName(@Param("userId") Long userId, @Param("userStoreName") String userStoreName);
 
-	// 회원 탈퇴 (Soft Delete)
+	// 회원 탈퇴
+	// 회원이 쓴 게시글 모두 삭제
+	void deletePostsByUserId(Long userId);
+	// 회원이 쓴 댓글 모두 삭제
+	void deleteCommentsByUserId(Long userId);
+	// 회원이 누른 좋아요 기록 삭제
+	void deleteLikesByUserId(Long userId);
+	// 회원 탈퇴
 	void withdrawUser(Long userId);
 
 	// 게시글 ID로 관련 댓글 모두 삭제
