@@ -1,5 +1,10 @@
 package com.jangsacartel.biz.user.mapper;
 
+import java.util.List;
+
+import com.jangsacartel.biz.user.dto.MyCommentDTO;
+import com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO;
+import com.jangsacartel.biz.user.dto.MyPostDTO;
 import com.jangsacartel.biz.user.entity.UserVO;
 import com.jangsacartel.biz.user.entity.UserInfoVO;
 
@@ -28,4 +33,22 @@ public interface UserMapper {
 
 	// 사업자 번호 중복 확인 (파라미터는 int)
 	boolean existsByBusinessRegNo(Integer businessRegNo);
+
+	// 마이페이지 프로필 조회
+	MyPageProfileResponseDTO findProfileByUserId(Long userId);
+
+	// 마이페이지 닉네임 수정
+	void updateNickname(@Param("userId") Long userId, @Param("nickname") String nickname);
+
+	// 마이페이지 내가 쓴 게시글 조회
+	List<MyPostDTO> findPostsByUserId(Long userId);
+
+	// 마이페이지 게시글 삭제
+	void deletePost(@Param("postId") Long postId, @Param("userId") Long userId);
+
+	// 내가 쓴 댓글
+	List<MyCommentDTO> findCommentsByUserId(Long userId);
+
+	// 내가 좋아요한 글
+	List<MyPostDTO> findLikedPostsByUserId(Long userId);
 }

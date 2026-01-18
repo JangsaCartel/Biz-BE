@@ -239,4 +239,13 @@
             deleted_at IS NULL
     </select>
 
+    <update id="updatePostByUser">
+        UPDATE Post
+        SET title = #{dto.title},
+            content = #{dto.content},
+            category_id = #{dto.categoryId},
+            modified_at = NOW()
+        WHERE post_id = #{postId}
+          AND user_id = #{userId}
+    </update>
 </mapper>
