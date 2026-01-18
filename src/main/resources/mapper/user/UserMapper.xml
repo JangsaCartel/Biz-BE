@@ -90,14 +90,15 @@
     </select>
 
     <select id="findCommentsByUserId" resultType="com.jangsacartel.biz.user.dto.MyCommentDTO">
-        SELECT
-            c.comment_id   AS commentId,
-            c.content      AS content,
-            c.created_at   AS createdAt,
-            c.post_id      AS postId,
-            p.title        AS postTitle
+        SELECT c.comment_id AS commentId,
+               c.content    AS content,
+               c.created_at AS createdAt,
+               c.post_id    AS postId,
+               p.title      AS postTitle,
+               cat.name     AS categoryName
         FROM Comment c
                  JOIN Post p ON c.post_id = p.post_id
+                 JOIN Category cat ON p.category_id = cat.category_id
         WHERE c.user_id = #{userId}
           AND c.deleted_at IS NULL
         ORDER BY c.created_at DESC
