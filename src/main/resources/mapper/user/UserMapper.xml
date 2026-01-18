@@ -6,11 +6,10 @@
 <mapper namespace="com.jangsacartel.biz.user.mapper.UserMapper">
 
     <select id="findProfileByUserId" resultType="com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO">
-        SELECT
-            u.user_id AS userId,
-            u.nickname AS nickname,
-            ui.user_storeName AS userStoreName,
-            ui.region AS region
+        SELECT u.user_id         AS userId,
+               u.nickname        AS nickname,
+               ui.user_storeName AS userStoreName,
+               ui.region         AS region
         FROM User u
                  LEFT JOIN User_Info ui ON u.user_id = ui.user_id
         WHERE u.user_id = #{userId}
@@ -23,13 +22,13 @@
     </update>
 
     <select id="findPostsByUserId" resultType="com.jangsacartel.biz.user.dto.MyPostDTO">
-        SELECT
-            p.post_id      AS postId,
-            p.title        AS title,
-            p.content      AS content,  p.created_at   AS createdAt,
-            c.name         AS categoryName,
-            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) AS likeCount,
-            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
+        SELECT p.post_id                                                                       AS postId,
+               p.title                                                                         AS title,
+               p.content                                                                       AS content,
+               p.created_at                                                                    AS createdAt,
+               c.name                                                                          AS categoryName,
+               (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id)                      AS likeCount,
+               (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
         FROM Post p
                  JOIN Category c ON p.category_id = c.category_id
         WHERE p.user_id = #{userId}
@@ -40,7 +39,8 @@
     <update id="deletePost">
         UPDATE Post
         SET deleted_at = NOW()
-        WHERE post_id = #{postId} AND user_id = #{userId}
+        WHERE post_id = #{postId}
+          AND user_id = #{userId}
     </update>
 
 
@@ -49,7 +49,7 @@
     </select>
 
     <select id="findByProviderAndProviderId" resultType="com.jangsacartel.biz.user.entity.UserVO">
-        SELECT user_id AS userId,
+        SELECT user_id     AS userId,
                nickname,
                provider,
                provider_id AS providerId
@@ -60,27 +60,25 @@
 
     <insert id="insertUser" parameterType="com.jangsacartel.biz.user.entity.UserVO"
             useGeneratedKeys="true" keyProperty="userId">
-        INSERT INTO User (
-            nickname, provider, provider_id
-        ) VALUES (
-                     #{nickname}, #{provider}, #{providerId}
-                 )
+        INSERT INTO User (nickname, provider, provider_id)
+        VALUES (#{nickname}, #{provider}, #{providerId})
     </insert>
 
     <insert id="insertUserInfo" parameterType="com.jangsacartel.biz.user.entity.UserInfoVO">
-        INSERT INTO User_Info (
-            user_id, region, user_storeName, business_type, business_reg_no, business_start_date
-        ) VALUES (
-                     #{userId}, #{region}, #{userStoreName}, #{businessType}, #{businessRegNo}, #{businessStartDate}
-                 )
+        INSERT INTO User_Info (user_id, region, user_storeName, business_type, business_reg_no, business_start_date)
+        VALUES (#{userId}, #{region}, #{userStoreName}, #{businessType}, #{businessRegNo}, #{businessStartDate})
     </insert>
 
     <select id="findUserInfoByUserId" resultType="com.jangsacartel.biz.user.entity.UserInfoVO">
-        SELECT * FROM User_Info WHERE user_id = #{userId}
+        SELECT *
+        FROM User_Info
+        WHERE user_id = #{userId}
     </select>
 
     <select id="findUserById" resultType="com.jangsacartel.biz.user.entity.UserVO">
-        SELECT * FROM User WHERE user_id = #{userId}
+        SELECT *
+        FROM User
+        WHERE user_id = #{userId}
     </select>
 
     <select id="existsByBusinessRegNo" parameterType="int" resultType="boolean">
@@ -101,17 +99,17 @@
                  JOIN Category cat ON p.category_id = cat.category_id
         WHERE c.user_id = #{userId}
           AND c.deleted_at IS NULL
+          AND p.deleted_at IS NULL
         ORDER BY c.created_at DESC
     </select>
 
     <select id="findLikedPostsByUserId" resultType="com.jangsacartel.biz.user.dto.MyPostDTO">
-        SELECT
-            p.post_id      AS postId,
-            p.title        AS title,
-            p.created_at   AS createdAt,
-            cat.name       AS categoryName,
-            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) AS likeCount,
-            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
+        SELECT p.post_id                                                                       AS postId,
+               p.title                                                                         AS title,
+               p.created_at                                                                    AS createdAt,
+               cat.name                                                                        AS categoryName,
+               (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id)                      AS likeCount,
+               (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
         FROM Like_Post lp
                  JOIN Post p ON lp.post_id = p.post_id
                  JOIN Category cat ON p.category_id = cat.category_id
@@ -122,13 +120,17 @@
 
     <update id="updateComment">
         UPDATE Comment
-        SET content = #{content}, created_at = NOW() WHERE comment_id = #{commentId} AND user_id = #{userId}
+        SET content    = #{content},
+            created_at = NOW()
+        WHERE comment_id = #{commentId}
+          AND user_id = #{userId}
     </update>
 
     <update id="deleteComment">
         UPDATE Comment
         SET deleted_at = NOW()
-        WHERE comment_id = #{commentId} AND user_id = #{userId}
+        WHERE comment_id = #{commentId}
+          AND user_id = #{userId}
     </update>
 
     <update id="updateRegion">
@@ -149,4 +151,16 @@
         WHERE user_id = #{userId}
     </update>
 
+    <update id="deleteCommentsByPostId">
+        UPDATE Comment
+        SET deleted_at = NOW()
+        WHERE post_id = #{postId}
+          AND deleted_at IS NULL
+    </update>
+
+    <update id="deleteMyPost">
+        UPDATE Post
+        SET deleted_at = NOW()
+        WHERE post_id = #{postId}
+    </update>
 </mapper>

@@ -36,10 +36,17 @@ public class UserService {
 		return userMapper.findPostsByUserId(userId);
 	}
 
-	// 게시글 삭제
+	// 게시글 삭제 (댓글 삭제 포함)
 	@Transactional
 	public void deletePost(Long userId, Long postId) {
-		userMapper.deletePost(postId, userId);
+		// 1. 게시글 삭제 시도 (Soft Delete)
+		// user_id 조건이 있어 본인 글이 아니면 삭제되지 않고 0을 반환함
+		int deletedCount = userMapper.deletePost(postId, userId);
+
+		// 2. 게시글이 정상적으로 삭제된 경우(본인 글)에만 댓글 삭제 수행
+		if (deletedCount > 0) {
+			userMapper.deleteCommentsByPostId(postId);
+		}
 	}
 
 	// ProviderId(소셜 ID)로 User ID(DB PK) 조회
@@ -98,4 +105,16 @@ public class UserService {
 		userMapper.withdrawUser(userId);
 	}
 
+	@Transactional
+	public void deleteMyPost(Long userId, Long postId) {
+		// 1. 게시글 존재 여부 및 본인 확인 (기존 로직 유지)
+		// Post post = userMapper.findPostById(postId);
+		// if (post == null || !post.getUserId().equals(userId)) { ... }
+
+		// 2. [추가] 해당 게시글에 달린 댓글 먼저 모두 삭제
+		userMapper.deleteCommentsByPostId(postId);
+
+		// 3. 게시글 삭제 (기존 로직)
+		userMapper.deleteMyPost(postId);
+	}
 }

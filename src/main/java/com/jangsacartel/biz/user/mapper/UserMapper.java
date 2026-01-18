@@ -44,7 +44,7 @@ public interface UserMapper {
 	List<MyPostDTO> findPostsByUserId(Long userId);
 
 	// 마이페이지 게시글 삭제
-	void deletePost(@Param("postId") Long postId, @Param("userId") Long userId);
+	int deletePost(@Param("postId") Long postId, @Param("userId") Long userId);
 
 	// 내가 쓴 댓글
 	List<MyCommentDTO> findCommentsByUserId(Long userId);
@@ -66,4 +66,10 @@ public interface UserMapper {
 
 	// 회원 탈퇴 (Soft Delete)
 	void withdrawUser(Long userId);
+
+	// 게시글 ID로 관련 댓글 모두 삭제
+	void deleteCommentsByPostId(Long postId);
+
+	// 기존 게시글 삭제 메서드 (참고용)
+	void deleteMyPost(Long postId);
 }
