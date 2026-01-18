@@ -66,4 +66,36 @@ public class UserService {
 		return userMapper.findLikedPostsByUserId(userId);
 	}
 
+	// 내 댓글 수정
+	@Transactional
+	public void updateComment(Long userId, Long commentId, String content) {
+		userMapper.updateComment(commentId, userId, content);
+	}
+
+	// 내 댓글 삭제
+	@Transactional
+	public void deleteComment(Long userId, Long commentId) {
+		userMapper.deleteComment(commentId, userId);
+	}
+
+	// 활동 지역 변경
+	@Transactional
+	public void updateRegion(Long userId, String region) {
+		userMapper.updateRegion(userId, region);
+	}
+
+	// 상호명 변경
+	@Transactional
+	public void updateUserStoreName(Long userId, String userStoreName) {
+		userMapper.updateUserStoreName(userId, userStoreName);
+	}
+
+	// 회원 탈퇴
+	@Transactional
+	public void withdrawUser(Long userId) {
+		// 추후 탈퇴 시 연관 데이터(User_Info 등) 처리 로직이 더 필요할 수 있음
+		// 현재는 User 테이블의 deleted_at 처리만 수행
+		userMapper.withdrawUser(userId);
+	}
+
 }

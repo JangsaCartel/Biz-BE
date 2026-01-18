@@ -26,7 +26,7 @@
         SELECT
             p.post_id      AS postId,
             p.title        AS title,
-            p.created_at   AS createdAt,
+            p.content      AS content,  p.created_at   AS createdAt,
             c.name         AS categoryName,
             (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) AS likeCount,
             (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
@@ -118,5 +118,34 @@
           AND p.deleted_at IS NULL
         ORDER BY lp.post_id DESC
     </select>
+
+    <update id="updateComment">
+        UPDATE Comment
+        SET content = #{content}, created_at = NOW() WHERE comment_id = #{commentId} AND user_id = #{userId}
+    </update>
+
+    <update id="deleteComment">
+        UPDATE Comment
+        SET deleted_at = NOW()
+        WHERE comment_id = #{commentId} AND user_id = #{userId}
+    </update>
+
+    <update id="updateRegion">
+        UPDATE User_Info
+        SET region = #{region}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateUserStoreName">
+        UPDATE User_Info
+        SET user_storeName = #{userStoreName}
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="withdrawUser">
+        UPDATE User
+        SET deleted_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
 
 </mapper>

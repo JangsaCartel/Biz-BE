@@ -51,4 +51,19 @@ public interface UserMapper {
 
 	// 내가 좋아요한 글
 	List<MyPostDTO> findLikedPostsByUserId(Long userId);
+
+	// 내가 쓴 댓글 수정
+	void updateComment(@Param("commentId") Long commentId, @Param("userId") Long userId, @Param("content") String content);
+
+	// 내가 쓴 댓글 삭제 (Soft Delete)
+	void deleteComment(@Param("commentId") Long commentId, @Param("userId") Long userId);
+
+	// 활동 지역 변경
+	void updateRegion(@Param("userId") Long userId, @Param("region") String region);
+
+	// 상호명 변경
+	void updateUserStoreName(@Param("userId") Long userId, @Param("userStoreName") String userStoreName);
+
+	// 회원 탈퇴 (Soft Delete)
+	void withdrawUser(Long userId);
 }
