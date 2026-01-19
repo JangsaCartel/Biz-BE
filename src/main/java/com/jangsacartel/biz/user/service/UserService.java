@@ -94,20 +94,27 @@ public class UserService {
 		userMapper.updateUserStoreName(userId, userStoreName);
 	}
 
-	// 회원 탈퇴 (게시글, 댓글, 좋아요, 유저 정보 일괄 삭제)
+	// 회원 탈퇴 (Hard Delete: 영구 삭제)
 	@Transactional
 	public void withdrawUser(Long userId) {
-		// 1. 회원이 작성한 댓글 모두 삭제
+		// 1. 회원이 누른 좋아요(게시글/댓글) 삭제
+		userMapper.deletePostLikesByUserId(userId);
+		userMapper.deleteCommentLikesByUserId(userId);
+
+		// 2. 회원이 작성한 댓글 삭제
 		userMapper.deleteCommentsByUserId(userId);
 
-		// 2. 회원이 작성한 게시글 모두 삭제
+		// 3. 회원이 작성한 게시글 삭제
+		// (DB FK 설정에 따라 게시글 삭제 시 게시글에 달린 댓글/좋아요도 함께 삭제되길 기대하거나, 별도 처리가 필요할 수 있음)
 		userMapper.deletePostsByUserId(userId);
 
-		// 3. 회원이 누른 좋아요 내역 삭제
-		userMapper.deleteLikesByUserId(userId);
+		// 4. 회원 상세 정보(User_Info) 삭제
+		userMapper.deleteUserInfoByUserId(userId);
 
-		// 4. 회원 정보 삭제 (Soft Delete - 계정 비활성화)
-		userMapper.withdrawUser(userId);
+		// 5. 회원 기본 정보(User) 영구 삭제
+		userMapper.hardDeleteUser(userId);
+
+		log.info("회원 탈퇴(영구 삭제) 완료: userId = {}", userId);
 	}
 
 }

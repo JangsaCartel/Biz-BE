@@ -55,11 +55,17 @@ public interface UserMapper {
 	// 상호명 변경
 	void updateUserStoreName(@Param("userId") Long userId, @Param("userStoreName") String userStoreName);
 
-	// 회원 탈퇴 (User 테이블 상태 변경)
-	void withdrawUser(Long userId);
-
-	// 회원 탈퇴용 일괄 삭제 메서드들
-	void deletePostsByUserId(Long userId);
+	// 회원 탈퇴
+	// 1. 회원이 누른 게시글 좋아요 삭제
+	void deletePostLikesByUserId(Long userId);
+	// 2. 회원이 누른 댓글 좋아요 삭제
+	void deleteCommentLikesByUserId(Long userId);
+	// 3. 회원이 작성한 댓글 삭제 (Hard Delete)
 	void deleteCommentsByUserId(Long userId);
-	void deleteLikesByUserId(Long userId);
+	// 4. 회원이 작성한 게시글 삭제 (Hard Delete)
+	void deletePostsByUserId(Long userId);
+	// 5. 회원 부가 정보 삭제 (User_Info)
+	void deleteUserInfoByUserId(Long userId);
+	// 6. 회원 본체 삭제 (User)
+	void hardDeleteUser(Long userId);
 }
