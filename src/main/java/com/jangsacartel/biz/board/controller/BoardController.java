@@ -181,8 +181,8 @@ public class BoardController {
 	})
     @ApiResponse(code = 200, message = "Successfully retrieved free board posts", response = BoardListResponseDTO.class)
 	public ResponseEntity<BoardListResponseDTO> getFreeBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 4);
-		int totalCount = boardService.countPostsByCategory(2);
+		List<BoardDTO> freeBoardPosts = boardService.findPostsByCategory(2, page, 4, null);
+		int totalCount = boardService.countPostsByCategory(2, null);
 		
         BoardListResponseDTO response = new BoardListResponseDTO(freeBoardPosts, totalCount);
 		
@@ -196,8 +196,8 @@ public class BoardController {
 	})
     @ApiResponse(code = 200, message = "Successfully retrieved info board posts", response = BoardListResponseDTO.class)
 	public ResponseEntity<BoardListResponseDTO> getInfoBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 4);
-		int totalCount = boardService.countPostsByCategory(3);
+		List<BoardDTO> infoBoardPosts = boardService.findPostsByCategory(3, page, 4, null);
+		int totalCount = boardService.countPostsByCategory(3, null);
 
         BoardListResponseDTO response = new BoardListResponseDTO(infoBoardPosts, totalCount);
 		
@@ -207,12 +207,15 @@ public class BoardController {
 	@GetMapping("/local")
 	@ApiOperation(value = "지역 게시판", notes = "지역 게시판의 게시글 목록을 조회합니다.")
 	@ApiImplicitParams({
-		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1")
+		@ApiImplicitParam(name = "page", value = "페이지 번호", dataType = "int", paramType = "query", defaultValue = "1", example = "1"),
+		@ApiImplicitParam(name = "region", value = "지역 필터 (예: '서울특별시 강남구 역삼동')", dataType = "string", paramType = "query")
 	})
     @ApiResponse(code = 200, message = "Successfully retrieved local board posts", response = BoardListResponseDTO.class)
-	public ResponseEntity<BoardListResponseDTO> getLocalBoardPage(@RequestParam(defaultValue = "1") int page) {
-		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 4);
-		int totalCount = boardService.countPostsByCategory(4);
+	public ResponseEntity<BoardListResponseDTO> getLocalBoardPage(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(required = false) String region) {
+		List<BoardDTO> localBoardPosts = boardService.findPostsByCategory(4, page, 4, region);
+		int totalCount = boardService.countPostsByCategory(4, region);
 		
 		BoardListResponseDTO response = new BoardListResponseDTO(localBoardPosts, totalCount);
 
