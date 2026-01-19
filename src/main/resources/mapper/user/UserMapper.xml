@@ -36,14 +36,6 @@
         ORDER BY p.created_at DESC
     </select>
 
-    <update id="deletePost">
-        UPDATE Post
-        SET deleted_at = NOW()
-        WHERE post_id = #{postId}
-          AND user_id = #{userId}
-    </update>
-
-
     <select id="getTime" resultType="string">
         SELECT NOW()
     </select>
@@ -118,21 +110,6 @@
         ORDER BY lp.post_id DESC
     </select>
 
-    <update id="updateComment">
-        UPDATE Comment
-        SET content    = #{content},
-            created_at = NOW()
-        WHERE comment_id = #{commentId}
-          AND user_id = #{userId}
-    </update>
-
-    <update id="deleteComment">
-        UPDATE Comment
-        SET deleted_at = NOW()
-        WHERE comment_id = #{commentId}
-          AND user_id = #{userId}
-    </update>
-
     <update id="updateRegion">
         UPDATE User_Info
         SET region = #{region}
@@ -168,18 +145,5 @@
         UPDATE User
         SET deleted_at = NOW()
         WHERE user_id = #{userId}
-    </update>
-
-    <update id="deleteCommentsByPostId">
-        UPDATE Comment
-        SET deleted_at = NOW()
-        WHERE post_id = #{postId}
-          AND deleted_at IS NULL
-    </update>
-
-    <update id="deleteMyPost">
-        UPDATE Post
-        SET deleted_at = NOW()
-        WHERE post_id = #{postId}
     </update>
 </mapper>

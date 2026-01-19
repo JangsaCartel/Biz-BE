@@ -15,23 +15,23 @@ import org.apache.ibatis.annotations.Param;
 public interface UserMapper {
 	String getTime();
 
-	// 1. 로그인 체크용 (User 테이블만 조회해도 됨)
+	// 1. 로그인 체크용
 	UserVO findByProviderAndProviderId(@Param("provider") String provider,
 		@Param("providerId") String providerId);
 
-	// 2. 기본 회원 저장 (User 테이블)
+	// 2. 기본 회원 저장
 	void insertUser(UserVO user);
 
-	// 3. 사업자 정보 저장 (User_Info 테이블)
+	// 3. 사업자 정보 저장
 	void insertUserInfo(UserInfoVO userInfo);
 
 	// 상세 정보 조회
 	UserInfoVO findUserInfoByUserId(Long userId);
 
-	// 기본 정보 조회 (닉네임 등)
+	// 기본 정보 조회
 	UserVO findUserById(Long userId);
 
-	// 사업자 번호 중복 확인 (파라미터는 int)
+	// 사업자 번호 중복 확인
 	boolean existsByBusinessRegNo(Integer businessRegNo);
 
 	// 마이페이지 프로필 조회
@@ -43,20 +43,11 @@ public interface UserMapper {
 	// 마이페이지 내가 쓴 게시글 조회
 	List<MyPostDTO> findPostsByUserId(Long userId);
 
-	// 마이페이지 게시글 삭제
-	int deletePost(@Param("postId") Long postId, @Param("userId") Long userId);
-
-	// 내가 쓴 댓글
+	// 내가 쓴 댓글 조회
 	List<MyCommentDTO> findCommentsByUserId(Long userId);
 
-	// 내가 좋아요한 글
+	// 내가 좋아요한 글 조회
 	List<MyPostDTO> findLikedPostsByUserId(Long userId);
-
-	// 내가 쓴 댓글 수정
-	void updateComment(@Param("commentId") Long commentId, @Param("userId") Long userId, @Param("content") String content);
-
-	// 내가 쓴 댓글 삭제 (Soft Delete)
-	void deleteComment(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
 	// 활동 지역 변경
 	void updateRegion(@Param("userId") Long userId, @Param("region") String region);
@@ -64,19 +55,11 @@ public interface UserMapper {
 	// 상호명 변경
 	void updateUserStoreName(@Param("userId") Long userId, @Param("userStoreName") String userStoreName);
 
-	// 회원 탈퇴
-	// 회원이 쓴 게시글 모두 삭제
-	void deletePostsByUserId(Long userId);
-	// 회원이 쓴 댓글 모두 삭제
-	void deleteCommentsByUserId(Long userId);
-	// 회원이 누른 좋아요 기록 삭제
-	void deleteLikesByUserId(Long userId);
-	// 회원 탈퇴
+	// 회원 탈퇴 (User 테이블 상태 변경)
 	void withdrawUser(Long userId);
 
-	// 게시글 ID로 관련 댓글 모두 삭제
-	void deleteCommentsByPostId(Long postId);
-
-	// 기존 게시글 삭제 메서드 (참고용)
-	void deleteMyPost(Long postId);
+	// 회원 탈퇴용 일괄 삭제 메서드들
+	void deletePostsByUserId(Long userId);
+	void deleteCommentsByUserId(Long userId);
+	void deleteLikesByUserId(Long userId);
 }
