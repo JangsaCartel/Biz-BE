@@ -191,12 +191,18 @@
             SUBSTRING(p.content, 1, 20) as content,
             p.created_at,
             (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
-            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count,
+            ui.region
         FROM
             Post p
+        JOIN
+            User_Info ui ON p.user_id = ui.user_id
         WHERE
             p.category_id = #{categoryId}
           AND p.deleted_at IS NULL
+          <if test="region != null and region != ''">
+              AND ui.region = #{region}
+          </if>
         ORDER BY
             p.created_at DESC
         LIMIT #{limit} OFFSET #{offset}
@@ -206,10 +212,15 @@
         SELECT
             COUNT(*)
         FROM
-            Post
+            Post p
+        JOIN
+            User_Info ui ON p.user_id = ui.user_id
         WHERE
-            category_id = #{categoryId}
-          AND deleted_at IS NULL
+            p.category_id = #{categoryId}
+            AND p.deleted_at IS NULL
+            <if test="region != null and region != ''">
+                AND ui.region = #{region}
+            </if>
     </select>
     
     <select id="selectHotBoardPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
