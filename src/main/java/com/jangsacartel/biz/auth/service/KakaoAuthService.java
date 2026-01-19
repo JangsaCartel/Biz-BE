@@ -157,6 +157,19 @@ public class KakaoAuthService {
 		if (user == null && additional != null) {
 			log.info("🆕 [Service] 신규 회원가입 진행: {}", additional.getNickname());
 
+			// 지역 정보 3개를 하나로 합치는 로직 추가 (공백 구분)
+			String fullRegion = String.format("%s %s %s",
+				additional.getUserSido().trim(),   // getCity() -> getUserSido()
+				additional.getUserGugun().trim(),  // getDistrict() -> getUserGugun()
+				additional.getUserDong().trim()    // getNeighborhood() -> getUserDong()
+			).trim();
+
+			// [안전 장치] VARCHAR(32) 길이 초과 방지
+			if (fullRegion.length() > 32) {
+				// 필요하다면 예외를 던지거나, 줄임말 처리를 해야 함
+				throw new IllegalArgumentException("주소 길이가 너무 깁니다. (최대 32자)");
+			}
+
 			// 1. User 테이블 저장
 			UserVO newUser = UserVO.builder()
 				.provider("kakao")
@@ -168,7 +181,7 @@ public class KakaoAuthService {
 			// 2. User_Info 테이블 저장
 			UserInfoVO newInfo = UserInfoVO.builder()
 				.userId(newUser.getUserId())
-				.region(additional.getRegion())
+				.region(fullRegion)
 				.userStoreName(additional.getUserStoreName())
 				.businessType(additional.getBusinessType())
 				.businessRegNo(additional.getBusinessRegNo())

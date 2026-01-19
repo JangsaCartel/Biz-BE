@@ -1,9 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jangsacartel.biz.user.mapper.UserMapper">
+
+    <select id="findProfileByUserId" resultType="com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO">
+        SELECT
+            u.user_id AS userId,
+            u.nickname AS nickname,
+            ui.user_storeName AS userStoreName,
+            ui.region AS region
+        FROM User u
+                 LEFT JOIN User_Info ui ON u.user_id = ui.user_id
+        WHERE u.user_id = #{userId}
+    </select>
+
+    <update id="updateNickname">
+        UPDATE User
+        SET nickname = #{nickname}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="findPostsByUserId" resultType="com.jangsacartel.biz.user.dto.MyPostDTO">
+        SELECT
+            p.post_id      AS postId,
+            p.title        AS title,
+            p.created_at   AS createdAt,
+            c.name         AS categoryName,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) AS likeCount,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
+        FROM Post p
+                 JOIN Category c ON p.category_id = c.category_id
+        WHERE p.user_id = #{userId}
+          AND p.deleted_at IS NULL
+        ORDER BY p.created_at DESC
+    </select>
+
+    <update id="deletePost">
+        UPDATE Post
+        SET deleted_at = NOW()
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </update>
+
+
     <select id="getTime" resultType="string">
         SELECT NOW()
     </select>
@@ -48,4 +88,35 @@
         FROM User_Info
         WHERE business_reg_no = #{businessRegNo}
     </select>
+
+    <select id="findCommentsByUserId" resultType="com.jangsacartel.biz.user.dto.MyCommentDTO">
+        SELECT
+            c.comment_id   AS commentId,
+            c.content      AS content,
+            c.created_at   AS createdAt,
+            c.post_id      AS postId,
+            p.title        AS postTitle
+        FROM Comment c
+                 JOIN Post p ON c.post_id = p.post_id
+        WHERE c.user_id = #{userId}
+          AND c.deleted_at IS NULL
+        ORDER BY c.created_at DESC
+    </select>
+
+    <select id="findLikedPostsByUserId" resultType="com.jangsacartel.biz.user.dto.MyPostDTO">
+        SELECT
+            p.post_id      AS postId,
+            p.title        AS title,
+            p.created_at   AS createdAt,
+            cat.name       AS categoryName,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) AS likeCount,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
+        FROM Like_Post lp
+                 JOIN Post p ON lp.post_id = p.post_id
+                 JOIN Category cat ON p.category_id = cat.category_id
+        WHERE lp.user_id = #{userId}
+          AND p.deleted_at IS NULL
+        ORDER BY lp.post_id DESC
+    </select>
+
 </mapper>
