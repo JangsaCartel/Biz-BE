@@ -32,6 +32,7 @@ public class PolicyServiceImpl implements PolicyService {
     @Value("${bizinfo.api.key}")
     private String bizinfoApiKey;
 
+    private static final String BIZINFO_ORIGIN = "https://www.bizinfo.go.kr";
     private static final String BIZINFO_API_URL =
             "https://www.bizinfo.go.kr/uss/rss/bizinfoApi.do";
 
@@ -139,7 +140,7 @@ public class PolicyServiceImpl implements PolicyService {
                 .contact(vo.getRefrncNm())
                 .htmlContent(vo.getBsnsSumryCn())
                 .applyUrl(vo.getRceptEngnHmpgUrl())
-                .originalUrl("https://www.bizinfo.go.kr" + vo.getPblancUrl())
+                .originalUrl(BIZINFO_ORIGIN + vo.getPblancUrl())
                 .mainFileName(vo.getPrintFileNm())
                 .printFlpthNm(vo.getPrintFlpthNm())
                 .extraFileNames(splitFileNames(vo.getFileNm()))
