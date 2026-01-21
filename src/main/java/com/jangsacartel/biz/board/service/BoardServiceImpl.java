@@ -153,14 +153,14 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public List<BoardDTO> findPostsByCategory(int categoryId, int page, int pageSize) {
+	public List<BoardDTO> findPostsByCategory(int categoryId, int page, int pageSize, String region) {
 		int offset = (page - 1) * pageSize;
-		return boardMapper.findPostsByCategory(categoryId, offset, pageSize);
+		return boardMapper.findPostsByCategory(categoryId, offset, pageSize, region);
 	}
 
 	@Override
-	public int countPostsByCategory(int categoryId) {
-		return boardMapper.countPostsByCategory(categoryId);
+	public int countPostsByCategory(int categoryId, String region) {
+		return boardMapper.countPostsByCategory(categoryId, region);
 	}
 
 	@Override

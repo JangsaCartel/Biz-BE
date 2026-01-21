@@ -218,26 +218,43 @@
     </select>
 
     <select id="findPostsByCategory" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
-        SELECT p.post_id,
-               p.title,
-               p.category_id,
-               SUBSTRING(p.content, 1, 20)                                                     as content,
-               p.created_at,
-               (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id)                      as like_count,
-               (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count
-        FROM Post p
-        WHERE p.category_id = #{categoryId}
+        SELECT
+            p.post_id,
+            p.title,
+            p.category_id,
+            SUBSTRING(p.content, 1, 20) as content,
+            p.created_at,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count,
+            ui.region
+        FROM
+            Post p
+        JOIN
+            User_Info ui ON p.user_id = ui.user_id
+        WHERE
+            p.category_id = #{categoryId}
           AND p.deleted_at IS NULL
-        ORDER BY p.created_at DESC
-            LIMIT #{limit}
-        OFFSET #{offset}
+          <if test="region != null and region != ''">
+              AND ui.region = #{region}
+          </if>
+        ORDER BY
+            p.created_at DESC
+        LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="countPostsByCategory" resultType="int">
-        SELECT COUNT(*)
-        FROM Post
-        WHERE category_id = #{categoryId}
-          AND deleted_at IS NULL
+        SELECT
+            COUNT(*)
+        FROM
+            Post p
+        JOIN
+            User_Info ui ON p.user_id = ui.user_id
+        WHERE
+            p.category_id = #{categoryId}
+            AND p.deleted_at IS NULL
+            <if test="region != null and region != ''">
+                AND ui.region = #{region}
+            </if>
     </select>
 
     <select id="selectHotBoardPosts" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
