@@ -30,7 +30,7 @@ public class SecurityConfig {
 			.formLogin().disable()
 			.httpBasic().disable()
 			.authorizeHttpRequests(auth -> auth
-				    .requestMatchers("/api/auth/**", "/api/kakao/**").permitAll()
+				    .requestMatchers("/api/auth/**", "/api/kakao/**", "/api/map/**").permitAll()
 				    .requestMatchers(
 				            "/swagger-ui.html",
 				            "/v2/api-docs",
