@@ -9,6 +9,7 @@ import java.util.Date;
 public class MyPostDTO {
 	private Long postId;
 	private String title;
+	private String content;
 	private Date createdAt;
 	private String categoryName;
 	private Long likeCount;

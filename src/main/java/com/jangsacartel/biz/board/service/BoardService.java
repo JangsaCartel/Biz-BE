@@ -59,4 +59,7 @@ public interface BoardService {
 
     // 유저 페이지 - 게시글 수정
     void updatePost(int postId, int userId, PostUpdateRequestDTO requestDTO);
+
+    // 유저 페이지 - 게시글 삭제 (댓글 삭제 포함)
+    void deletePost(int postId, int userId);
 }

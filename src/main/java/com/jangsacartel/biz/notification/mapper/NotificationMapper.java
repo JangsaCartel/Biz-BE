@@ -42,4 +42,10 @@ public interface NotificationMapper {
 
 	int deleteReadOlderThanDays(@Param("days") int days);
 
+	// 게시글 ID로 관련 알림 전체 삭제
+	void deleteByPostId(int postId);
+
+	// 댓글 ID로 관련 알림 삭제
+	void deleteByCommentId(int commentId);
+
 }

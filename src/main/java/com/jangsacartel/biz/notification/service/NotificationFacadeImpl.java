@@ -33,4 +33,16 @@ public class NotificationFacadeImpl implements NotificationFacade {
 
         notificationService.trySend(saved);
     }
+
+    // 게시글 삭제 연결
+    @Override
+    public void deleteNotificationsByPost(int postId) {
+        notificationService.deleteNotificationsByPostId(postId);
+    }
+
+    // 댓글 삭제 연결
+    @Override
+    public void deleteNotificationsByComment(int commentId) {
+        notificationService.deleteNotificationsByCommentId(commentId);
+    }
 }

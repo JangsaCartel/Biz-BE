@@ -1,106 +1,117 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.jangsacartel.biz.notification.mapper.NotificationMapper">
 
-  <resultMap id="NotificationMap" type="com.jangsacartel.biz.notification.dto.NotificationDTO">
-    <result column="notification_id" property="notificationId"/>
-    <result column="receiver_user_id" property="receiverUserId"/>
-    <result column="actor_user_id" property="actorUserId"/>
-    <result column="type" property="type"/>
-    <result column="title" property="title"/>
-    <result column="message" property="message"/>
-    <result column="post_id" property="postId"/>
-    <result column="comment_id" property="commentId"/>
-    <result column="is_read" property="isRead"/>
-    <result column="created_at" property="createdAt"/>
-  </resultMap>
+    <resultMap id="NotificationMap" type="com.jangsacartel.biz.notification.dto.NotificationDTO">
+        <result column="notification_id" property="notificationId"/>
+        <result column="receiver_user_id" property="receiverUserId"/>
+        <result column="actor_user_id" property="actorUserId"/>
+        <result column="type" property="type"/>
+        <result column="title" property="title"/>
+        <result column="message" property="message"/>
+        <result column="post_id" property="postId"/>
+        <result column="comment_id" property="commentId"/>
+        <result column="is_read" property="isRead"/>
+        <result column="created_at" property="createdAt"/>
+    </resultMap>
 
-  <insert id="insertNotification"
-          parameterType="com.jangsacartel.biz.notification.dto.NotificationDTO"
-          useGeneratedKeys="true" keyProperty="notificationId">
-    INSERT INTO Notification
-    (receiver_user_id, actor_user_id, type, title, message, post_id, comment_id, is_read, created_at)
-    VALUES
-    (#{receiverUserId}, #{actorUserId}, #{type}, #{title}, #{message}, #{postId}, #{commentId}, 0, NOW())
-  </insert>
+    <insert id="insertNotification"
+            parameterType="com.jangsacartel.biz.notification.dto.NotificationDTO"
+            useGeneratedKeys="true" keyProperty="notificationId">
+        INSERT INTO Notification
+        (receiver_user_id, actor_user_id, type, title, message, post_id, comment_id, is_read, created_at)
+        VALUES (#{receiverUserId}, #{actorUserId}, #{type}, #{title}, #{message}, #{postId}, #{commentId}, 0, NOW())
+    </insert>
 
-  <select id="findPending" resultMap="NotificationMap">
-    SELECT *
-    FROM Notification
-    WHERE receiver_user_id = #{receiverUserId}
-    ORDER BY created_at ASC
-    LIMIT #{limit}
-  </select>
+    <select id="findPending" resultMap="NotificationMap">
+        SELECT *
+        FROM Notification
+        WHERE receiver_user_id = #{receiverUserId}
+        ORDER BY created_at ASC
+            LIMIT #{limit}
+    </select>
 
-  <select id="findByReceiver" resultMap="NotificationMap">
-    SELECT *
-    FROM Notification
-    WHERE receiver_user_id = #{receiverUserId}
-    ORDER BY created_at DESC
-    LIMIT #{limit} OFFSET #{offset}
-  </select>
+    <select id="findByReceiver" resultMap="NotificationMap">
+        SELECT *
+        FROM Notification
+        WHERE receiver_user_id = #{receiverUserId}
+        ORDER BY created_at DESC
+            LIMIT #{limit}
+        OFFSET #{offset}
+    </select>
 
-  <select id="countUnread" resultType="int">
-    SELECT COUNT(*)
-    FROM Notification
-    WHERE receiver_user_id = #{receiverUserId}
-      AND is_read = 0
-  </select>
+    <select id="countUnread" resultType="int">
+        SELECT COUNT(*)
+        FROM Notification
+        WHERE receiver_user_id = #{receiverUserId}
+          AND is_read = 0
+    </select>
 
-  <update id="markRead">
-    UPDATE Notification
-    SET is_read = 1
-    WHERE notification_id = #{notificationId}
-      AND receiver_user_id = #{receiverUserId}
-  </update>
+    <update id="markRead">
+        UPDATE Notification
+        SET is_read = 1
+        WHERE notification_id = #{notificationId}
+          AND receiver_user_id = #{receiverUserId}
+    </update>
 
-  <update id="markAllRead">
-    UPDATE Notification
-    SET is_read = 1
-    WHERE receiver_user_id = #{receiverUserId}
-      AND is_read = 0
-  </update>
+    <update id="markAllRead">
+        UPDATE Notification
+        SET is_read = 1
+        WHERE receiver_user_id = #{receiverUserId}
+          AND is_read = 0
+    </update>
 
-  <delete id="deleteRead">
-    DELETE FROM Notification
-    WHERE receiver_user_id = #{receiverUserId}
-      AND is_read = 1
-  </delete>
+    <delete id="deleteRead">
+        DELETE
+        FROM Notification
+        WHERE receiver_user_id = #{receiverUserId}
+          AND is_read = 1
+    </delete>
 
-  <delete id="deleteById">
-    DELETE FROM Notification
-    WHERE notification_id = #{notificationId}
-  </delete>
+    <delete id="deleteById">
+        DELETE
+        FROM Notification
+        WHERE notification_id = #{notificationId}
+    </delete>
 
-  <delete id="deleteBatch">
-    DELETE FROM Notification
-    WHERE notification_id IN
-    <foreach collection="ids" item="id" open="(" separator="," close=")">
-      #{id}
-    </foreach>
-  </delete>
-  
-<select id="findUnreadAfterId" resultMap="NotificationMap">
-  SELECT *
-  FROM Notification
-  WHERE receiver_user_id = #{receiverUserId}
-    AND is_read = 0
-    <if test="afterNotificationId != null">
-      AND notification_id &gt; #{afterNotificationId}
-    </if>
-  ORDER BY notification_id ASC
-  LIMIT #{limit}
-</select>
+    <delete id="deleteBatch">
+        DELETE FROM Notification
+        WHERE notification_id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
-<delete id="deleteReadOlderThanDays">
-  DELETE FROM Notification
-  WHERE is_read = 1
-    AND created_at &lt; DATE_SUB(NOW(), INTERVAL #{days} DAY)
-</delete>
+    <select id="findUnreadAfterId" resultMap="NotificationMap">
+        SELECT *
+        FROM Notification
+        WHERE receiver_user_id = #{receiverUserId}
+        AND is_read = 0
+        <if test="afterNotificationId != null">
+            AND notification_id &gt; #{afterNotificationId}
+        </if>
+        ORDER BY notification_id ASC
+        LIMIT #{limit}
+    </select>
 
-  
+    <delete id="deleteReadOlderThanDays">
+        DELETE
+        FROM Notification
+        WHERE is_read = 1
+          AND created_at &lt; DATE_SUB(NOW(), INTERVAL #{days} DAY)
+    </delete>
+
+    <delete id="deleteByPostId" parameterType="int">
+        DELETE FROM Notification
+        WHERE post_id = #{postId}
+    </delete>
+
+    <delete id="deleteByCommentId" parameterType="int">
+        DELETE FROM Notification
+        WHERE comment_id = #{commentId}
+    </delete>
 
 </mapper>
