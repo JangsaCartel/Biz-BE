@@ -222,6 +222,17 @@ public class BoardController {
 		return ResponseEntity.ok(response);
 	}
 
+    @GetMapping("/board/hot-by-region")
+    @ApiOperation(value = "지역별 인기 게시글 조회", notes = "특정 지역의 인기 게시글을 조회합니다. (최대 3개)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "region", value = "지역 필터 (예: '서울특별시 강남구')", dataType = "string", paramType = "query", required = false)
+    })
+    @ApiResponse(code = 200, message = "Successfully retrieved hot posts by region", response = BoardDTO.class, responseContainer = "List")
+    public ResponseEntity<List<BoardDTO>> getHotPostsByRegion(@RequestParam(required = false) String region) {
+        List<BoardDTO> hotPosts = boardService.findHotPostsByRegion(region, 3); // Limit to 3 as requested
+        return ResponseEntity.ok(hotPosts);
+    }
+
 	// 유저 페이지 - 게시글 수정
 	@ApiOperation(value = "게시글 수정", notes = "작성자가 자신의 게시글을 수정합니다.")
 	@PatchMapping("/board/{postId}")

@@ -235,7 +235,7 @@
             p.category_id = #{categoryId}
           AND p.deleted_at IS NULL
           <if test="region != null and region != ''">
-              AND ui.region = #{region}
+              AND ui.region LIKE CONCAT(#{region}, '%')
           </if>
         ORDER BY
             p.created_at DESC
@@ -253,7 +253,7 @@
             p.category_id = #{categoryId}
             AND p.deleted_at IS NULL
             <if test="region != null and region != ''">
-                AND ui.region = #{region}
+                AND ui.region LIKE CONCAT(#{region}, '%')
             </if>
     </select>
 
@@ -270,6 +270,24 @@
         ORDER BY like_count DESC, p.created_at DESC
             LIMIT #{limit}
         OFFSET #{offset}
+    </select>
+
+    <select id="findHotPostsByRegion" resultType="com.jangsacartel.biz.board.dto.BoardDTO">
+        SELECT
+            p.post_id,
+            p.title,
+            p.created_at,
+            (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id) as like_count,
+            (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) as comment_count
+        FROM Post p
+        JOIN User_Info ui ON p.user_id = ui.user_id
+        WHERE p.deleted_at IS NULL
+          AND p.category_id = 4 -- '우리동네' category
+          <if test="region != null and region != ''">
+            AND ui.region LIKE CONCAT(#{region}, '%')
+          </if>
+        ORDER BY like_count DESC, p.created_at DESC
+        LIMIT #{limit}
     </select>
 
     <select id="countHotBoardPosts" resultType="int">

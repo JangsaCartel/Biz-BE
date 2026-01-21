@@ -102,6 +102,10 @@ dependencies {
     implementation 'commons-fileupload:commons-fileupload:1.5'
     implementation 'commons-io:commons-io:2.15.1'
 
+    /* Geometry/Spatial */
+    implementation 'org.locationtech.jts:jts-core:1.19.0'
+    implementation 'org.wololo:jts2geojson:0.18.1'
+
     /* Test */
     testImplementation "org.springframework:spring-test:${springVersion}"
     testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"

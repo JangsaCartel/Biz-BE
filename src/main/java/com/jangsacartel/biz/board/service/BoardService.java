@@ -53,6 +53,8 @@ public interface BoardService {
     
     List<BoardDTO> findHotBoardPosts(int page, int pageSize);
     
+    List<BoardDTO> findHotPostsByRegion(String region, int limit);
+    
     int getHotBoardPostsCount();
 
     // 유저 페이지 - 게시글 수정
