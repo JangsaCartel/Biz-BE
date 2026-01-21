@@ -14,6 +14,7 @@ import com.jangsacartel.biz.board.dto.LikeCommentDTO;
 import com.jangsacartel.biz.board.dto.LikePostDTO;
 import com.jangsacartel.biz.board.dto.PostUpdateRequestDTO;
 import com.jangsacartel.biz.board.mapper.BoardMapper;
+import com.jangsacartel.biz.notification.service.NotificationFacade;
 
 @Service
 public class BoardServiceImpl implements BoardService {
@@ -23,6 +24,9 @@ public class BoardServiceImpl implements BoardService {
 
 	@Autowired
 	private CommentService commentService;
+
+	@Autowired
+	private NotificationFacade notificationFacade;
 
     // 게시글(Post) 관련 서비스 구현
     @Override
@@ -188,22 +192,25 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	@Transactional
 	public void deletePost(int postId, int userId) {
-		// 1. 게시글 조회
+		// 게시글 조회
 		BoardDTO post = boardMapper.findPostById(postId, userId);
 
 		if (post == null) {
 			throw new IllegalArgumentException("게시글이 존재하지 않습니다.");
 		}
 
-		// 2. 권한 확인
+		// 권한 확인
 		if (post.getUserId() != userId) {
 			throw new IllegalArgumentException("삭제 권한이 없습니다.");
 		}
 
-		// 3. 댓글 먼저 삭제 (CommentService 활용)
+		// 알림 삭제 (Hard Delete)
+		notificationFacade.deleteNotificationsByPost(postId);
+
+		// 댓글 먼저 삭제 (CommentService 활용)
 		commentService.deleteCommentsByPostId(postId);
 
-		// 4. 게시글 삭제
+		// 게시글 삭제
 		boardMapper.deletePost(postId);
 	}
 

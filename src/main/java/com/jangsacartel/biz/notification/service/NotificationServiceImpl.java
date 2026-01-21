@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.jangsacartel.biz.notification.dto.NotificationDTO;
@@ -123,5 +124,19 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void deleteRead(int receiverUserId) {
         notificationMapper.deleteRead(receiverUserId);
+    }
+
+    // 게시글 관련 알림 삭제 구현
+    @Override
+    @Transactional
+    public void deleteNotificationsByPostId(int postId) {
+        notificationMapper.deleteByPostId(postId);
+    }
+
+    // 댓글 관련 알림 삭제 구현
+    @Override
+    @Transactional
+    public void deleteNotificationsByCommentId(int commentId) {
+        notificationMapper.deleteByCommentId(commentId);
     }
 }
