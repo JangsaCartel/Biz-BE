@@ -168,6 +168,11 @@ public class BoardServiceImpl implements BoardService {
 		return Math.min(totalCount, 100);
 	}
 
+    @Override
+    public List<BoardDTO> findHotPostsByRegion(String region, int limit) {
+        return boardMapper.findHotPostsByRegion(region, limit);
+    }
+
 	// 유저 페이지 - 게시글 수정
 	@Override
 	@Transactional
