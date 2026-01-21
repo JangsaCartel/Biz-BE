@@ -58,6 +58,8 @@ public interface BoardMapper {
     
     List<BoardDTO> selectHotBoardPosts(@Param("offset") int offset, @Param("limit") int limit);
     
+    List<BoardDTO> findHotPostsByRegion(@Param("region") String region, @Param("limit") int limit);
+    
     int countHotBoardPosts();
 
     // 게시글 수정 (작성자 본인 확인 기능이 포함된 수정 메서드)
