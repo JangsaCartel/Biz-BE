@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jangsacartel.biz.board.dto.BoardDTO;
 import com.jangsacartel.biz.board.dto.CommentDTO;
@@ -179,4 +180,41 @@ public class CommentServiceImpl implements CommentService {
         return t.substring(0, max) + "…";
     }
 
+    // 게시글 삭제 시 관련 댓글 일괄 삭제
+    @Override
+    public void deleteCommentsByPostId(int postId) {
+        List<CommentDTO> comments = boardMapper.findCommentsByPostId(postId);
+        for (CommentDTO comment : comments) {
+            boardMapper.deleteComment(comment.getCommentId());
+        }
+    }
+
+    // 댓글 수정
+    @Override
+    @Transactional
+    public void updateComment(int commentId, int userId, String content) {
+        CommentDTO comment = boardMapper.findCommentById(commentId);
+        if (comment == null) {
+            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
+        }
+        if (comment.getUserId() != userId) {
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
+        comment.setContent(content);
+        boardMapper.updateComment(comment);
+    }
+
+    // 댓글 삭제
+    @Override
+    @Transactional
+    public void deleteComment(int commentId, int userId) {
+        CommentDTO comment = boardMapper.findCommentById(commentId);
+        if (comment == null) {
+            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
+        }
+        if (comment.getUserId() != userId) {
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+        }
+        boardMapper.deleteComment(commentId);
+    }
 }

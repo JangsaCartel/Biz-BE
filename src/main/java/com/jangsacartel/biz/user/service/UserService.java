@@ -1,5 +1,7 @@
 package com.jangsacartel.biz.user.service;
 
+import com.jangsacartel.biz.board.service.BoardService;
+import com.jangsacartel.biz.board.service.CommentService;
 import com.jangsacartel.biz.user.dto.MyCommentDTO;
 import com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO;
 import com.jangsacartel.biz.user.dto.MyPostDTO;
@@ -17,6 +19,8 @@ import java.util.List;
 public class UserService {
 
 	private final UserMapper userMapper;
+	private final BoardService boardService;
+	private final CommentService commentService;
 
 	// 프로필 조회
 	@Transactional(readOnly = true)
@@ -36,10 +40,10 @@ public class UserService {
 		return userMapper.findPostsByUserId(userId);
 	}
 
-	// 게시글 삭제
+	// 게시글 삭제 (댓글 삭제 포함)
 	@Transactional
 	public void deletePost(Long userId, Long postId) {
-		userMapper.deletePost(postId, userId);
+		boardService.deletePost(postId.intValue(), userId.intValue());
 	}
 
 	// ProviderId(소셜 ID)로 User ID(DB PK) 조회
@@ -64,6 +68,53 @@ public class UserService {
 	@Transactional(readOnly = true)
 	public List<MyPostDTO> getMyLikedPosts(Long userId) {
 		return userMapper.findLikedPostsByUserId(userId);
+	}
+
+	// 댓글 수정
+	@Transactional
+	public void updateComment(Long userId, Long commentId, String content) {
+		commentService.updateComment(commentId.intValue(), userId.intValue(), content);
+	}
+
+	// 댓글 삭제
+	@Transactional
+	public void deleteComment(Long userId, Long commentId) {
+		commentService.deleteComment(commentId.intValue(), userId.intValue());
+	}
+
+	// 활동 지역 변경
+	@Transactional
+	public void updateRegion(Long userId, String region) {
+		userMapper.updateRegion(userId, region);
+	}
+
+	// 상호명 변경
+	@Transactional
+	public void updateUserStoreName(Long userId, String userStoreName) {
+		userMapper.updateUserStoreName(userId, userStoreName);
+	}
+
+	// 회원 탈퇴 (Hard Delete: 영구 삭제)
+	@Transactional
+	public void withdrawUser(Long userId) {
+		// 1. 회원이 누른 좋아요(게시글/댓글) 삭제
+		userMapper.deletePostLikesByUserId(userId);
+		userMapper.deleteCommentLikesByUserId(userId);
+
+		// 2. 회원이 작성한 댓글 삭제
+		userMapper.deleteCommentsByUserId(userId);
+
+		// 3. 회원이 작성한 게시글 삭제
+		// (DB FK 설정에 따라 게시글 삭제 시 게시글에 달린 댓글/좋아요도 함께 삭제되길 기대하거나, 별도 처리가 필요할 수 있음)
+		userMapper.deletePostsByUserId(userId);
+
+		// 4. 회원 상세 정보(User_Info) 삭제
+		userMapper.deleteUserInfoByUserId(userId);
+
+		// 5. 회원 기본 정보(User) 영구 삭제
+		userMapper.hardDeleteUser(userId);
+
+		log.info("회원 탈퇴(영구 삭제) 완료: userId = {}", userId);
 	}
 
 }

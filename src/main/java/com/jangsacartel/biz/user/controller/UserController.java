@@ -5,10 +5,14 @@ import java.util.List;
 import com.jangsacartel.biz.auth.dto.UserResponseDTO;
 import com.jangsacartel.biz.auth.service.KakaoAuthService;
 import com.jangsacartel.biz.global.jwt.filter.CustomUserDetails;
+import com.jangsacartel.biz.user.dto.CommentUpdateRequestDTO;
 import com.jangsacartel.biz.user.dto.MyCommentDTO;
 import com.jangsacartel.biz.user.dto.MyPageProfileResponseDTO;
 import com.jangsacartel.biz.user.dto.MyPostDTO;
 import com.jangsacartel.biz.user.dto.NicknameUpdateRequestDTO;
+import com.jangsacartel.biz.user.dto.RegionUpdateRequestDTO;
+import com.jangsacartel.biz.user.dto.StoreNameUpdateRequestDTO;
+import com.jangsacartel.biz.user.dto.UserProfileDTO;
 import com.jangsacartel.biz.user.service.UserService;
 
 import io.swagger.annotations.Api;
@@ -55,11 +59,11 @@ public class UserController {
             @ApiResponse(code = 500, message = "서버 내부 오류")
     })
 	@GetMapping
-	public ResponseEntity<UserResponseDTO> getUserInfo(
+	public ResponseEntity<UserProfileDTO> getUserInfo(
 			@ApiIgnore
 			@AuthenticationPrincipal CustomUserDetails userDetails) {
 
-		// [추가된 안전장치] 토큰 없이 들어왔을 경우 방어
+		// [안전장치] 토큰 없이 들어왔을 경우 방어
 		if (userDetails == null) {
 			log.warn("❌ [Controller] 인증되지 않은 사용자의 접근입니다.");
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 에러 반환
@@ -68,9 +72,22 @@ public class UserController {
 		log.info("ℹ️ [Controller] 내 정보 조회 요청: {}", userDetails.getUsername());
 
 		String providerId = userDetails.getProviderId();
-		UserResponseDTO userInfo = kakaoAuthService.getUserInfoByProviderId(providerId);
 
-		return ResponseEntity.ok(userInfo);
+		// 1. 서비스에서 전체 정보 가져오기 (여기엔 토큰이 포함된 자식 객체가 있을 수 있음)
+		UserResponseDTO fullInfo = kakaoAuthService.getUserInfoByProviderId(providerId);
+
+		// 2. [보안 핵심] 안전한 DTO로 데이터 옮겨 담기 (매핑)
+		// 토큰 필드가 아예 없는 UserProfileDTO를 사용하여 원천 차단
+		UserProfileDTO safeProfile = UserProfileDTO.builder()
+			.nickname(fullInfo.getNickname())
+			.region(fullInfo.getRegion())
+			.userStoreName(fullInfo.getUserStoreName())
+			.businessType(fullInfo.getBusinessType())
+			.businessRegNo(fullInfo.getBusinessRegNo())
+			.businessStartDate(fullInfo.getBusinessStartDate())
+			.build();
+
+		return ResponseEntity.ok(safeProfile);
 	}
 
 	// 마이페이지 닉네임/상호명/지역 조회 - UserService 사용
@@ -161,6 +178,94 @@ public class UserController {
 		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
 
 		return ResponseEntity.ok(userService.getMyLikedPosts(userId));
+	}
+
+	// 내가 쓴 댓글 관리
+	@ApiOperation(value = "내 댓글 수정", notes = "본인이 작성한 댓글 내용을 수정합니다.")
+	@PatchMapping("/comments/{commentId}")
+	public ResponseEntity<String> updateMyComment(
+		@PathVariable Long commentId,
+		@ApiIgnore @AuthenticationPrincipal CustomUserDetails userDetails,
+		@RequestBody CommentUpdateRequestDTO requestDTO) { // @Valid 제거
+
+		if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+		// (선택 사항) 라이브러리 대신 수동으로 유효성 검사를 하려면 아래와 같이 작성
+		if (requestDTO.getContent() == null || requestDTO.getContent().trim().isEmpty()) {
+			return ResponseEntity.badRequest().body("댓글 내용을 입력해주세요.");
+		}
+
+		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
+		userService.updateComment(userId, commentId, requestDTO.getContent());
+
+		return ResponseEntity.ok("댓글이 수정되었습니다.");
+	}
+
+	@ApiOperation(value = "내 댓글 삭제", notes = "본인이 작성한 댓글을 삭제합니다.")
+	@DeleteMapping("/comments/{commentId}")
+	public ResponseEntity<String> deleteMyComment(
+		@PathVariable Long commentId,
+		@ApiIgnore @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
+
+		userService.deleteComment(userId, commentId);
+
+		return ResponseEntity.ok("댓글이 삭제되었습니다.");
+	}
+
+	// 유저 정보 추가 수정
+	@ApiOperation(value = "활동 지역 변경", notes = "유저의 활동 지역을 변경합니다.")
+	@PatchMapping("/region")
+	public ResponseEntity<String> updateRegion(
+		@ApiIgnore @AuthenticationPrincipal CustomUserDetails userDetails,
+		@RequestBody RegionUpdateRequestDTO requestDTO) { // @Valid 제거
+
+		if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+		// 수동 검사 예시
+		if (requestDTO.getRegion() == null || requestDTO.getRegion().trim().isEmpty()) {
+			return ResponseEntity.badRequest().body("지역명을 입력해주세요.");
+		}
+
+		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
+		userService.updateRegion(userId, requestDTO.getRegion());
+
+		return ResponseEntity.ok("지역 정보가 변경되었습니다.");
+	}
+
+	@ApiOperation(value = "상호명 변경", notes = "유저의 상호명을 변경합니다.")
+	@PatchMapping("/store-name")
+	public ResponseEntity<String> updateStoreName(
+		@ApiIgnore @AuthenticationPrincipal CustomUserDetails userDetails,
+		@RequestBody StoreNameUpdateRequestDTO requestDTO) { // @Valid 제거
+
+		if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+		// 수동 검사 예시
+		if (requestDTO.getUserStoreName() == null || requestDTO.getUserStoreName().trim().isEmpty()) {
+			return ResponseEntity.badRequest().body("상호명을 입력해주세요.");
+		}
+
+		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
+		userService.updateUserStoreName(userId, requestDTO.getUserStoreName());
+
+		return ResponseEntity.ok("상호명이 변경되었습니다.");
+	}
+
+	// 회원 탈퇴
+	@ApiOperation(value = "회원 탈퇴", notes = "회원 계정을 삭제(탈퇴) 처리합니다.")
+	@DeleteMapping("/withdraw")
+	public ResponseEntity<String> withdrawUser(
+		@ApiIgnore @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+		if (userDetails == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		Long userId = userService.getUserIdByProviderId(userDetails.getProviderId());
+
+		userService.withdrawUser(userId);
+
+		return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
 	}
 
 }

@@ -16,4 +16,13 @@ public interface CommentService {
     void deleteComment(int commentId);
 
     void likeComment(int commentId, int userId);
+
+    // 게시글 ID로 댓글 일괄 삭제 (게시글 삭제 시 사용)
+    void deleteCommentsByPostId(int postId);
+
+    // 본인 확인 후 댓글 수정
+    void updateComment(int commentId, int userId, String content);
+
+    // 본인 확인 후 댓글 삭제
+    void deleteComment(int commentId, int userId);
 }
