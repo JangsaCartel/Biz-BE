@@ -305,4 +305,14 @@
         WHERE post_id = #{postId}
           AND user_id = #{userId}
     </update>
+
+    <delete id="deleteExpiredPosts">
+        DELETE FROM Post
+        WHERE deleted_at IS NOT NULL AND deleted_at &lt; DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+    </delete>
+
+    <delete id="deleteExpiredComments">
+        DELETE FROM Comment
+        WHERE deleted_at IS NOT NULL AND deleted_at &lt; DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+    </delete>
 </mapper>
