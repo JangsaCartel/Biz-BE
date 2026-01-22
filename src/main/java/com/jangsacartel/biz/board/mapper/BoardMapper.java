@@ -67,4 +67,7 @@ public interface BoardMapper {
     int updatePostByUser(@Param("postId") int postId,
         @Param("userId") int userId,
         @Param("dto") PostUpdateRequestDTO dto);
+    
+    int deleteExpiredPosts();
+    int deleteExpiredComments();
 }
