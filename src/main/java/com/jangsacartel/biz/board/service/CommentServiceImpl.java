@@ -96,18 +96,30 @@ public class CommentServiceImpl implements CommentService {
 
         // 댓글 ID는 반드시 있어야 알림 이벤트도 안정적
         final Integer newCommentId = comment.getCommentId();
-        if (newCommentId == null) return;
 
         // (A) 게시글 주인 조회
         BoardDTO post = boardMapper.findPostById(postId, null);
         if (post == null) return;
         final int postOwnerId = post.getUserId();
+        
+        // 게시글 제목 / 댓글 내용 준비
+        String rawTitle = post.getTitle();
+        if (rawTitle == null || rawTitle.trim().isEmpty()) rawTitle = "제목없음";
+        final String postTitle = ellipsis(rawTitle, 20);
 
         // (B) parent_comment 주인 조회(대댓글인 경우만)
         Integer parentOwnerId = null;
+        String parentCommentPreview = null;
+        
         if (parentCommentId != null) {
             CommentDTO parent = boardMapper.findCommentById(parentCommentId);
-            if (parent != null) parentOwnerId = parent.getUserId();
+            if (parent != null) {
+                parentOwnerId = parent.getUserId();
+
+                String rawParentContent = parent.getContent();
+                if (rawParentContent == null || rawParentContent.trim().isEmpty()) rawParentContent = "내용없음";
+                parentCommentPreview = ellipsis(rawParentContent, 20);
+            }
         }
 
         // (C) 수신자 결정 (중복 제거)
@@ -136,16 +148,36 @@ public class CommentServiceImpl implements CommentService {
 
             event.setPostId(postId);
             event.setCommentId(newCommentId);
+            
+            String msg;
+            if (receiverId == postOwnerId) {
+                // 게시글 작성자에게: [글 제목]
+                String actionText = (parentCommentId == null) ? "새 댓글" : "새 대댓글";
+                event.setTitle(parentCommentId == null ? "댓글 알림" : "대댓글 알림");
+                msg = "[" + postTitle + "]에 " + actionText + "이 달렸습니다.";
+            } else if (parentOwnerId != null && receiverId.equals(parentOwnerId)) {
+                // 대댓글 대상 댓글 작성자에게: [댓글]
+                event.setTitle("대댓글 알림");
+                msg = "[" + (parentCommentPreview != null ? parentCommentPreview : "내용없음") + "]에 새 대댓글이 달렸습니다.";
+            } else {
+                // 예외 케이스 방어
+                event.setTitle("알림");
+                msg = "[" + postTitle + "]에 새 알림이 있습니다.";
+            }
 
-            event.setTitle(parentCommentId == null ? "댓글 알림" : "대댓글 알림");
-            event.setMessage(parentCommentId == null
-                ? postId + "번 글에 새 댓글이 달렸습니다"
-                : postId + "번 글에 새 대댓글이 달렸습니다");
+            event.setMessage(msg);
 
             event.setCreatedAt(LocalDateTime.now().toString());
 
             notificationFacade.notify(event);
         }
+    }
+    
+    private static String ellipsis(String s, int max) {
+    	if(s==null)return "";
+    	String t = s.trim();
+    	if (t.length() <= max) return t;
+        return t.substring(0, max) + "…";
     }
 
     // 게시글 삭제 시 관련 댓글 일괄 삭제
