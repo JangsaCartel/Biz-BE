@@ -26,6 +26,7 @@
                p.title                                                                         AS title,
                p.content                                                                       AS content,
                p.created_at                                                                    AS createdAt,
+               p.modified_at                                                                   AS modifiedAt,
                c.name                                                                          AS categoryName,
                (SELECT COUNT(*) FROM Like_Post WHERE post_id = p.post_id)                      AS likeCount,
                (SELECT COUNT(*) FROM Comment WHERE post_id = p.post_id AND deleted_at IS NULL) AS commentCount
@@ -123,26 +124,38 @@
     </update>
 
     <delete id="deletePostLikesByUserId">
-        DELETE FROM Like_Post WHERE user_id = #{userId}
+        DELETE
+        FROM Like_Post
+        WHERE user_id = #{userId}
     </delete>
 
     <delete id="deleteCommentLikesByUserId">
-        DELETE FROM Like_Comment WHERE user_id = #{userId}
+        DELETE
+        FROM Like_Comment
+        WHERE user_id = #{userId}
     </delete>
 
     <delete id="deleteCommentsByUserId">
-        DELETE FROM Comment WHERE user_id = #{userId}
+        DELETE
+        FROM Comment
+        WHERE user_id = #{userId}
     </delete>
 
     <delete id="deletePostsByUserId">
-        DELETE FROM Post WHERE user_id = #{userId}
+        DELETE
+        FROM Post
+        WHERE user_id = #{userId}
     </delete>
 
     <delete id="deleteUserInfoByUserId">
-        DELETE FROM User_Info WHERE user_id = #{userId}
+        DELETE
+        FROM User_Info
+        WHERE user_id = #{userId}
     </delete>
 
     <delete id="hardDeleteUser">
-        DELETE FROM User WHERE user_id = #{userId}
+        DELETE
+        FROM User
+        WHERE user_id = #{userId}
     </delete>
 </mapper>
