@@ -29,12 +29,10 @@ public class GeoDataService {
     @PostConstruct
     @SuppressWarnings("unchecked")
     public void loadGeoJsonData() {
-        logger.info("Loading GeoJSON data for administrative districts...");
         try (InputStream inputStream = new ClassPathResource("data/HangJeongDong_ver20250401.geojson").getInputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();
             Map<String, Object> featureCollectionMap = objectMapper.readValue(inputStream, new TypeReference<Map<String, Object>>() {});
             this.allFeatures = (List<Map<String, Object>>) featureCollectionMap.get("features");
-            logger.info("Successfully loaded {} features.", allFeatures.size());
         } catch (Exception e) {
             logger.error("Failed to load or parse GeoJSON file.", e);
         }
@@ -46,7 +44,6 @@ public class GeoDataService {
         result.put("type", "FeatureCollection");
 
         if (allFeatures == null) {
-            logger.warn("GeoJSON features not loaded. Returning empty collection.");
             result.put("features", new ArrayList<>());
             return result;
         }
