@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		String uri = request.getRequestURI();
 	    String ctx = request.getContextPath();  // 보통 "/biz-be"
 	    String path = (ctx != null && !ctx.isEmpty()) ? uri.substring(ctx.length()) : uri;
-		return path.startsWith("/api/auth/") 
+		return path.startsWith("/api/auth/")
 				|| path.startsWith("/api/kakao/")
 				|| path.startsWith("/v2/api-docs")
 		        || path.startsWith("/swagger")
@@ -46,8 +46,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 		throws ServletException, IOException {
-
-		System.out.println("🟢 [Filter] doFilterInternal() 호출됨: " + request.getRequestURI());
 
 		String authHeader = request.getHeader("Authorization");
 
@@ -60,8 +58,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 				String subject = claims.getSubject(); // provider:providerId
 				String role = claims.get("role", String.class);
-
-				log.info("📌 [Filter] 토큰 사용자 식별: {}, 권한: {}", subject, role);
 
 				// 2. provider, providerId 파싱
 				String[] parts = subject.split(":", 2);
@@ -79,7 +75,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 				// 4. SecurityContext에 등록
 				SecurityContextHolder.getContext().setAuthentication(auth);
-				System.out.println("✅ [Filter] 인증 객체 등록 완료");
 
 			} catch (ExpiredJwtException e) {
 				log.error("❌ [Filter] 토큰 만료: {}", e.getMessage());
