@@ -63,11 +63,8 @@ public class PolicyServiceImpl implements PolicyService {
             url += "&hashtags=" + hashtagsParam;
         }
 
-        log.info("Bizinfo API 호출: {}", url);
-
         // 4. 외부 API 호출 후 Raw JSON 문자열 수신
         String rawJson = restTemplate.getForObject(url, String.class);
-        log.info("Bizinfo raw body = {}", rawJson);
 
         // 5. JSON → BizinfoPolicyResponseVO 역직렬화
         BizinfoPolicyResponseVO response;
