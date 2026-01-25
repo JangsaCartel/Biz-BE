@@ -15,8 +15,7 @@ public class DeletionScheduler {
 
     private final BoardMapper boardMapper;
 
-    @Scheduled(cron = "0 0 3 * * *") // 매 1분마다 실행
-    //    cron = "0 0 3 * * *" 테스트 완료 후 새벽 3시마다 실행하는 것으로 변경 예정
+    @Scheduled(cron = "0 0 3 * * *") // 매 새벽 3시마다 실행
     public void deleteExpiredData() {
         
         try {
