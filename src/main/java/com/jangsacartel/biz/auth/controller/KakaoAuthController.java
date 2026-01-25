@@ -49,7 +49,6 @@ public class KakaoAuthController {
 	    })
 	@GetMapping("/auth/login/kakao")
 	public ResponseEntity<?> kakaoCallback(@RequestParam("code") String code) {
-		log.info("🚀 [Controller] 카카오 로그인 요청 받음");
 
 		// 1. 토큰 및 유저정보 획득
 		KakaoTokenResponse kakaoToken = authService.getKakaoAccessToken(code);
@@ -60,7 +59,6 @@ public class KakaoAuthController {
 
 		if (exists) {
 			// [CASE A] 이미 가입됨 -> 바로 로그인 처리 (토큰 발급)
-			log.info("✅ [Controller] 기존 회원 로그인 성공");
 			String jwt = authService.loginOrRegisterUser(kakaoUser, null);
 
 			HttpHeaders headers = new HttpHeaders();
@@ -72,7 +70,6 @@ public class KakaoAuthController {
 				.body(new TokenResponseWrapper(jwt, "LOGIN_SUCCESS"));
 		} else {
 			// [CASE B] 미가입 -> 회원가입 필요 메시지 + Provider ID 반환
-			log.info("⚠️ [Controller] 신규 회원 -> 회원가입 필요");
 			return ResponseEntity.status(HttpStatus.OK) // 200 OK로 보내되 상태값으로 구분
 				.body(new SignupNeededResponse("NEED_SIGNUP", kakaoUser.getProviderId()));
 		}
@@ -107,7 +104,6 @@ public class KakaoAuthController {
 			@RequestBody AdditionalUserInfoDTO request,
 			@RequestParam("providerId") String providerId) 
 	{
-		log.info("📝 [Controller] 회원가입 요청 받음 (ProviderId: {})", providerId);
 
 		KakaoUserInfo kakaoUser = new KakaoUserInfo();
 		kakaoUser.setProvider("kakao");

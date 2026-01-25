@@ -69,8 +69,6 @@ public class UserController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 에러 반환
 		}
 
-		log.info("ℹ️ [Controller] 내 정보 조회 요청: {}", userDetails.getUsername());
-
 		String providerId = userDetails.getProviderId();
 
 		// 1. 서비스에서 전체 정보 가져오기 (여기엔 토큰이 포함된 자식 객체가 있을 수 있음)

@@ -113,8 +113,7 @@ public class UserService {
 
 		// 5. 회원 기본 정보(User) 영구 삭제
 		userMapper.hardDeleteUser(userId);
-
-		log.info("회원 탈퇴(영구 삭제) 완료: userId = {}", userId);
+		log.info("회원 탈퇴 처리 완료");
 	}
 
 }

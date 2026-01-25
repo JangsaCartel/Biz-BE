@@ -35,7 +35,7 @@ public class JwtUtil {
 		if (token != null && token.startsWith("Bearer ")) {
 			token = token.substring(7).trim();
 		}
-		log.info("🔍 토큰 유효성 검사 시작: '{}'", token != null ? token.substring(0, 10) + "..." : "null");
+		log.info("🔍 토큰 유효성 검사 시작");
 
 		return Jwts.parserBuilder()
 			.setSigningKey(key)
