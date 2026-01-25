@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.jangsacartel.biz.global.jwt.util.JwtUtil;
-import com.jangsacartel.biz.notification.service.NotificationFacade;
 import com.jangsacartel.biz.notification.service.NotificationService;
 
 import io.jsonwebtoken.Claims;
@@ -24,7 +23,6 @@ public class NotificationSseController {
 
     private final NotificationService notificationService;
     private final JwtUtil jwtUtil;
-    private final NotificationFacade notificationFacade;
 
     private int getUserId(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
@@ -126,29 +124,4 @@ public class NotificationSseController {
         notificationService.markRead(userId, notificationId);
         return Map.of("ok", true);
     }
-
-//    @ApiOperation(
-//        value = "알림 테스트 발송(개발용)",
-//        notes = "현재 로그인 사용자에게 테스트 알림을 1건 발송합니다."
-//    )
-//    @ApiResponses({
-//        @ApiResponse(code = 200, message = "성공")
-//    })
-//    @PostMapping("/test")
-//    public Map<String, Object> test(HttpServletRequest request) {
-//        int actor = 2;
-//        int receiver = getUserId(request);
-//
-//        NotificationEvent event = new NotificationEvent();
-//        event.setEventId("test-" + System.currentTimeMillis());
-//        event.setType(NotificationType.COMMENT_CREATED);
-//        event.setActorUserId(actor);
-//        event.setReceiverUserId(receiver);
-//        event.setTitle("댓글 알림");
-//        event.setMessage("71번 글에 새 댓글이 달렸습니다");
-//        event.setPostId(71);
-//
-//        notificationFacade.notify(event);
-//        return Map.of("ok", true);
-//    }
 }
