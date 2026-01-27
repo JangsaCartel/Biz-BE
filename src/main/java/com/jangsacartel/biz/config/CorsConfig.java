@@ -13,7 +13,8 @@ import java.util.Arrays;
 @Order(0)
 public class CorsConfig {
 
-    @Bean
+    // 현재는 SecurityConfig에서 CORS를 관리하므로 CorsFilter Bean 미사용
+    // @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration c = new CorsConfiguration();
         c.setAllowCredentials(true);
