@@ -35,5 +35,5 @@ jobs:
           context: .
           push: true
           tags: |
-            jangsacartel/biz-be:latest
-            jangsacartel/biz-be:${{ github.sha }}
+            minyoung06/biz-be:latest
+            minyoung06/biz-be:${{ github.sha }}
