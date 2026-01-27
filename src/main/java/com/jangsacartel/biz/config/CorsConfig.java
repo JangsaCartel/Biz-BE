@@ -18,8 +18,8 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration c = new CorsConfiguration();
         c.setAllowCredentials(true);
-        c.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000", "http://localhost:5173", "https://livin-fe.vercel.app"
+        c.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:3000", "http://localhost:5173", "https://livin-fe.vercel.app", "https://*.vercel.app"
         ));
         c.setAllowedHeaders(Arrays.asList("*"));
         c.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
