@@ -13,12 +13,13 @@ import java.util.Arrays;
 @Order(0)
 public class CorsConfig {
 
-    @Bean
+    // 현재는 SecurityConfig에서 CORS를 관리하므로 CorsFilter Bean 미사용
+    // @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration c = new CorsConfiguration();
         c.setAllowCredentials(true);
-        c.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000", "http://localhost:5173", "https://livin-fe.vercel.app"
+        c.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:3000", "http://localhost:5173", "https://livin-fe.vercel.app", "https://*.vercel.app"
         ));
         c.setAllowedHeaders(Arrays.asList("*"));
         c.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
